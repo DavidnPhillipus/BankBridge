@@ -1,7 +1,7 @@
-// BankBridge Prisma schema.
-// Only auth-related models are defined now (Step 4). The full canonical data
-// model (Bank, Account, Transaction, Consent, Application, ApiKey, AuditLog,
-// Notification, Merchant, Category, Analytics) is added in Step 5.
+// BankBridge Prisma schema — full canonical data model (Step 5).
+//
+// This models the PLATFORM's normalized view of the world. Bank-specific shapes
+// never live here; adapters translate raw bank payloads into these entities.
 
 generator client {
   provider = "prisma-client-js"
@@ -12,11 +12,70 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+// ---------------------------------------------------------------------------
+// Enums
+// ---------------------------------------------------------------------------
+
 enum Role {
   CUSTOMER
   DEVELOPER
   ADMIN
 }
+
+enum AccountType {
+  CHECKING
+  SAVINGS
+  CREDIT
+  LOAN
+  INVESTMENT
+}
+
+enum TransactionType {
+  DEBIT
+  CREDIT
+}
+
+enum TransactionStatus {
+  PENDING
+  POSTED
+}
+
+enum CategoryType {
+  INCOME
+  EXPENSE
+  TRANSFER
+}
+
+enum ConsentStatus {
+  PENDING
+  ACTIVE
+  REVOKED
+  EXPIRED
+}
+
+enum ConsentScope {
+  ACCOUNTS_READ
+  BALANCES_READ
+  TRANSACTIONS_READ
+  IDENTITY_READ
+}
+
+enum AppEnvironment {
+  SANDBOX
+  PRODUCTION
+}
+
+enum NotificationType {
+  INFO
+  LOW_BALANCE
+  FRAUD_ALERT
+  CONSENT
+  INSIGHT
+}
+
+// ---------------------------------------------------------------------------
+// Identity & auth
+// ---------------------------------------------------------------------------
 
 model User {
   id           String   @id @default(uuid())
@@ -29,13 +88,17 @@ model User {
   createdAt    DateTime @default(now())
   updatedAt    DateTime @updatedAt
 
-  refreshTokens RefreshToken[]
+  refreshTokens      RefreshToken[]
+  accounts           Account[]
+  consents           Consent[]
+  applications       Application[]
+  notifications      Notification[]
+  auditLogs          AuditLog[]
+  analyticsSnapshots AnalyticsSnapshot[]
 
   @@map("users")
 }
 
-// Refresh tokens are stored hashed to support rotation + server-side
-// revocation (logout / compromise). The raw token never touches the DB.
 model RefreshToken {
   id        String    @id @default(uuid())
   userId    String
@@ -48,4 +111,222 @@ model RefreshToken {
 
   @@index([userId])
   @@map("refresh_tokens")
+}
+
+// ---------------------------------------------------------------------------
+// Banks & financial data (normalized)
+// ---------------------------------------------------------------------------
+
+model Bank {
+  id           String   @id @default(uuid())
+  // adapterKey maps this record to a concrete BankAdapter implementation.
+  adapterKey   String   @unique
+  name         String
+  slug         String   @unique
+  logoUrl      String?
+  primaryColor String?
+  country      String   @default("NA")
+  isActive     Boolean  @default(true)
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  accounts Account[]
+  consents Consent[]
+
+  @@map("banks")
+}
+
+model Account {
+  id               String      @id @default(uuid())
+  userId           String
+  bankId           String
+  // The account id as known to the bank (used for adapter round-trips).
+  externalId       String
+  name             String
+  accountType      AccountType
+  mask             String? // last 4 digits
+  currency         String      @default("NAD")
+  balance          Decimal     @default(0) @db.Decimal(18, 2)
+  availableBalance Decimal     @default(0) @db.Decimal(18, 2)
+  createdAt        DateTime    @default(now())
+  updatedAt        DateTime    @updatedAt
+
+  user         User          @relation(fields: [userId], references: [id], onDelete: Cascade)
+  bank         Bank          @relation(fields: [bankId], references: [id], onDelete: Cascade)
+  transactions Transaction[]
+
+  @@unique([bankId, externalId])
+  @@index([userId])
+  @@map("accounts")
+}
+
+model Transaction {
+  id          String            @id @default(uuid())
+  accountId   String
+  externalId  String
+  amount      Decimal           @db.Decimal(18, 2)
+  currency    String            @default("NAD")
+  type        TransactionType
+  status      TransactionStatus @default(POSTED)
+  description String
+  merchantId  String?
+  categoryId  String?
+  bookedAt    DateTime
+  createdAt   DateTime          @default(now())
+
+  account  Account   @relation(fields: [accountId], references: [id], onDelete: Cascade)
+  merchant Merchant? @relation(fields: [merchantId], references: [id], onDelete: SetNull)
+  category Category? @relation(fields: [categoryId], references: [id], onDelete: SetNull)
+
+  @@unique([accountId, externalId])
+  @@index([accountId, bookedAt])
+  @@index([categoryId])
+  @@map("transactions")
+}
+
+model Category {
+  id    String       @id @default(uuid())
+  name  String       @unique
+  type  CategoryType @default(EXPENSE)
+  icon  String?
+  color String?
+
+  transactions Transaction[]
+  merchants    Merchant[]
+
+  @@map("categories")
+}
+
+model Merchant {
+  id         String  @id @default(uuid())
+  name       String  @unique
+  logoUrl    String?
+  categoryId String?
+
+  category     Category?     @relation(fields: [categoryId], references: [id], onDelete: SetNull)
+  transactions Transaction[]
+
+  @@map("merchants")
+}
+
+// ---------------------------------------------------------------------------
+// Consent & developer platform
+// ---------------------------------------------------------------------------
+
+model Application {
+  id           String         @id @default(uuid())
+  ownerId      String
+  name         String
+  description  String?
+  environment  AppEnvironment @default(SANDBOX)
+  redirectUris String[]
+  isActive     Boolean        @default(true)
+  createdAt    DateTime       @default(now())
+  updatedAt    DateTime       @updatedAt
+
+  owner    User      @relation(fields: [ownerId], references: [id], onDelete: Cascade)
+  apiKeys  ApiKey[]
+  consents Consent[]
+
+  @@index([ownerId])
+  @@map("applications")
+}
+
+model ApiKey {
+  id            String         @id @default(uuid())
+  applicationId String
+  name          String
+  // Only the hash is stored; the raw key is shown once at creation.
+  keyPrefix     String         @unique
+  keyHash       String         @unique
+  scopes        ConsentScope[]
+  environment   AppEnvironment @default(SANDBOX)
+  lastUsedAt    DateTime?
+  expiresAt     DateTime?
+  revokedAt     DateTime?
+  createdAt     DateTime       @default(now())
+
+  application Application @relation(fields: [applicationId], references: [id], onDelete: Cascade)
+
+  @@index([applicationId])
+  @@map("api_keys")
+}
+
+model Consent {
+  id            String         @id @default(uuid())
+  userId        String
+  applicationId String
+  bankId        String
+  status        ConsentStatus  @default(PENDING)
+  scopes        ConsentScope[]
+  expiresAt     DateTime
+  revokedAt     DateTime?
+  createdAt     DateTime       @default(now())
+  updatedAt     DateTime       @updatedAt
+
+  user        User        @relation(fields: [userId], references: [id], onDelete: Cascade)
+  application Application @relation(fields: [applicationId], references: [id], onDelete: Cascade)
+  bank        Bank        @relation(fields: [bankId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([applicationId])
+  @@index([status])
+  @@map("consents")
+}
+
+// ---------------------------------------------------------------------------
+// Observability & engagement
+// ---------------------------------------------------------------------------
+
+model AuditLog {
+  id           String   @id @default(uuid())
+  actorId      String?
+  action       String
+  resourceType String
+  resourceId   String?
+  ip           String?
+  userAgent    String?
+  metadata     Json?
+  createdAt    DateTime @default(now())
+
+  actor User? @relation(fields: [actorId], references: [id], onDelete: SetNull)
+
+  @@index([actorId])
+  @@index([resourceType, resourceId])
+  @@index([createdAt])
+  @@map("audit_logs")
+}
+
+model Notification {
+  id        String           @id @default(uuid())
+  userId    String
+  type      NotificationType @default(INFO)
+  title     String
+  message   String
+  isRead    Boolean          @default(false)
+  createdAt DateTime         @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId, isRead])
+  @@map("notifications")
+}
+
+// Pre-aggregated per-user monthly analytics. Kept as a cache/snapshot so
+// dashboards stay fast; the analytics module recomputes on demand too.
+model AnalyticsSnapshot {
+  id           String   @id @default(uuid())
+  userId       String
+  period       String // YYYY-MM
+  totalIncome  Decimal  @default(0) @db.Decimal(18, 2)
+  totalExpense Decimal  @default(0) @db.Decimal(18, 2)
+  net          Decimal  @default(0) @db.Decimal(18, 2)
+  byCategory   Json?
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, period])
+  @@map("analytics_snapshots")
 }
