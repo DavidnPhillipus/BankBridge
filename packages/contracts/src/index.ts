@@ -13,3 +13,4 @@ export * from './models/finance';
 export * from './models/consent';
 export * from './models/developer';
 export * from './models/platform';
+export * from './models/insights';

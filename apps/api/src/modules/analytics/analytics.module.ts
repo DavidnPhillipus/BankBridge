@@ -23,6 +23,6 @@ import { AnalyticsController } from './interface/analytics.controller';
     RecomputeSnapshotsUseCase,
     { provide: ANALYTICS_REPOSITORY, useClass: PrismaAnalyticsRepository },
   ],
-  exports: [AnalyticsSyncService, ANALYTICS_REPOSITORY],
+  exports: [AnalyticsSyncService, ANALYTICS_REPOSITORY, GetOverviewUseCase],
 })
 export class AnalyticsModule {}
