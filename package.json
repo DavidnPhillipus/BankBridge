@@ -1,0 +1,32 @@
+{
+  "name": "bankbridge",
+  "version": "0.1.0",
+  "private": true,
+  "description": "BankBridge - Open Banking Platform for Namibia",
+  "workspaces": [
+    "apps/*",
+    "packages/*"
+  ],
+  "scripts": {
+    "dev:api": "npm run start:dev --workspace @bankbridge/api",
+    "dev:web": "npm run dev --workspace @bankbridge/web",
+    "build": "npm run build --workspaces --if-present",
+    "lint": "npm run lint --workspaces --if-present",
+    "lint:fix": "npm run lint:fix --workspaces --if-present",
+    "typecheck": "npm run typecheck --workspaces --if-present",
+    "format": "prettier --write \"{apps,packages}/**/*.{ts,tsx,mjs,json,css}\"",
+    "format:check": "prettier --check \"{apps,packages}/**/*.{ts,tsx,mjs,json,css}\"",
+    "docker:up": "docker compose up -d",
+    "docker:down": "docker compose down"
+  },
+  "devDependencies": {
+    "eslint": "^9.9.0",
+    "prettier": "^3.3.3",
+    "typescript": "^5.5.4"
+  },
+  "engines": {
+    "node": ">=20.11.0",
+    "npm": ">=10.0.0"
+  },
+  "license": "UNLICENSED"
+}

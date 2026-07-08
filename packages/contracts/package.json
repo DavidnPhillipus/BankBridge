@@ -1,0 +1,21 @@
+{
+  "name": "@bankbridge/contracts",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Shared canonical data models, Zod schemas, and TypeScript types",
+  "main": "src/index.ts",
+  "types": "src/index.ts",
+  "scripts": {
+    "lint": "eslint .",
+    "lint:fix": "eslint . --fix",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "zod": "^3.23.8"
+  },
+  "devDependencies": {
+    "@bankbridge/config": "*",
+    "eslint": "^9.9.0",
+    "typescript": "^5.5.4"
+  }
+}
