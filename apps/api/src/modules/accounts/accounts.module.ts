@@ -22,6 +22,6 @@ import { AccountsController } from './interface/accounts.controller';
     GetAccountBalanceUseCase,
     { provide: ACCOUNT_REPOSITORY, useClass: PrismaAccountRepository },
   ],
-  exports: [ACCOUNT_REPOSITORY],
+  exports: [ACCOUNT_REPOSITORY, SyncAccountsUseCase],
 })
 export class AccountsModule {}

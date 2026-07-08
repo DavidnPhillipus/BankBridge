@@ -33,6 +33,47 @@ export const analyticsSnapshotSchema = z.object({
 });
 export type AnalyticsSnapshot = z.infer<typeof analyticsSnapshotSchema>;
 
+/** Spend aggregated for one category over the analysis window. */
+export const categorySpendSchema = z.object({
+  category: z.string(),
+  amount: z.number(),
+  percentage: z.number(), // share of total expense (0-100)
+});
+export type CategorySpend = z.infer<typeof categorySpendSchema>;
+
+/** Spend aggregated for one merchant over the analysis window. */
+export const merchantSpendSchema = z.object({
+  merchant: z.string(),
+  amount: z.number(),
+  count: z.number(),
+});
+export type MerchantSpend = z.infer<typeof merchantSpendSchema>;
+
+/** Income/expense/net for a single month (trend point). */
+export const monthlyPointSchema = z.object({
+  period: z.string(), // YYYY-MM
+  totalIncome: z.number(),
+  totalExpense: z.number(),
+  net: z.number(),
+});
+export type MonthlyPoint = z.infer<typeof monthlyPointSchema>;
+
+/** Dashboard analytics over a rolling window (GET /analytics/overview). */
+export const analyticsOverviewSchema = z.object({
+  from: z.string(), // ISO date
+  to: z.string(), // ISO date
+  months: z.number(),
+  totalIncome: z.number(),
+  totalExpense: z.number(),
+  net: z.number(),
+  savingsRate: z.number(), // 0-100
+  transactionCount: z.number(),
+  byCategory: z.array(categorySpendSchema),
+  topMerchants: z.array(merchantSpendSchema),
+  monthlyTrend: z.array(monthlyPointSchema),
+});
+export type AnalyticsOverview = z.infer<typeof analyticsOverviewSchema>;
+
 /** Generic paginated envelope reused across list endpoints. */
 export const paginationQuerySchema = z.object({
   page: z.coerce.number().int().positive().default(1),
