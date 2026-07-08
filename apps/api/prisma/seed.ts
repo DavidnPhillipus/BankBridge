@@ -5,30 +5,36 @@ const prisma = new PrismaClient();
 
 // The four simulated Namibian banks. `adapterKey` links each to its mock
 // adapter implementation (built in Step 6).
+// logoUrl points at /public/banks/<slug>.png in the web app. Drop the bank
+// logo images there (named by slug) and they render automatically.
 const BANKS = [
   {
     adapterKey: 'bank_windhoek',
     name: 'Bank Windhoek',
     slug: 'bank-windhoek',
     primaryColor: '#0033A0',
+    logoUrl: '/banks/bank-windhoek.png',
   },
   {
     adapterKey: 'fnb_namibia',
     name: 'FNB Namibia',
     slug: 'fnb-namibia',
     primaryColor: '#008752',
+    logoUrl: '/banks/fnb-namibia.png',
   },
   {
     adapterKey: 'standard_bank_namibia',
     name: 'Standard Bank Namibia',
     slug: 'standard-bank-namibia',
     primaryColor: '#0033A1',
+    logoUrl: '/banks/standard-bank-namibia.png',
   },
   {
     adapterKey: 'nedbank_namibia',
     name: 'Nedbank Namibia',
     slug: 'nedbank-namibia',
     primaryColor: '#006A4D',
+    logoUrl: '/banks/nedbank-namibia.png',
   },
 ] as const;
 
@@ -72,7 +78,12 @@ async function seedBanks(): Promise<void> {
   for (const bank of BANKS) {
     await prisma.bank.upsert({
       where: { adapterKey: bank.adapterKey },
-      update: { name: bank.name, slug: bank.slug, primaryColor: bank.primaryColor },
+      update: {
+        name: bank.name,
+        slug: bank.slug,
+        primaryColor: bank.primaryColor,
+        logoUrl: bank.logoUrl,
+      },
       create: { ...bank, country: 'NA', isActive: true },
     });
   }
