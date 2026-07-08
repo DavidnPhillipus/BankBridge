@@ -47,6 +47,11 @@ export default function RegisterPage(): React.ReactElement {
     <main className="flex min-h-screen items-center justify-center p-6">
       <Card className="w-full max-w-md">
         <CardHeader>
+          <div className="mb-2">
+            <Link href="/" className="text-sm text-muted-foreground hover:text-primary">
+              ← Back to home
+            </Link>
+          </div>
           <CardTitle>Create account</CardTitle>
           <CardDescription>Join BankBridge as a customer</CardDescription>
         </CardHeader>

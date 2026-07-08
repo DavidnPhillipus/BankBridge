@@ -10,7 +10,7 @@
   "scripts": {
     "dev:api": "npm run start:dev --workspace @bankbridge/api",
     "dev:web": "npm run dev --workspace @bankbridge/web",
-    "build": "npm run build --workspaces --if-present",
+    "build": "npm run build --workspace @bankbridge/contracts && npm run build --workspace @bankbridge/api && npm run build --workspace @bankbridge/web",
     "lint": "npm run lint --workspaces --if-present",
     "lint:fix": "npm run lint:fix --workspaces --if-present",
     "typecheck": "npm run typecheck --workspaces --if-present",

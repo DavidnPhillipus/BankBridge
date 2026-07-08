@@ -43,6 +43,11 @@ export default function LoginPage(): React.ReactElement {
     <main className="flex min-h-screen items-center justify-center p-6">
       <Card className="w-full max-w-md">
         <CardHeader>
+          <div className="mb-2">
+            <Link href="/" className="text-sm text-muted-foreground hover:text-primary">
+              ← Back to home
+            </Link>
+          </div>
           <CardTitle>Welcome back</CardTitle>
           <CardDescription>Sign in to your BankBridge account</CardDescription>
         </CardHeader>
