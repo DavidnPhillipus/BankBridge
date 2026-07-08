@@ -1,4 +1,5 @@
 import { Module } from '@nestjs/common';
+import { ListPublicApplicationsUseCase } from './application/list-public-applications.use-case';
 import { CreateApplicationUseCase } from './application/create-application.use-case';
 import { DeleteApplicationUseCase } from './application/delete-application.use-case';
 import { GetApplicationUseCase } from './application/get-application.use-case';
@@ -6,6 +7,7 @@ import { ListApplicationsUseCase } from './application/list-applications.use-cas
 import { UpdateApplicationUseCase } from './application/update-application.use-case';
 import { APPLICATION_REPOSITORY } from './domain/application-repository.port';
 import { PrismaApplicationRepository } from './infrastructure/prisma-application.repository';
+import { PublicApplicationsController } from './interface/public-applications.controller';
 import { ApplicationsController } from './interface/applications.controller';
 
 /**
@@ -14,9 +16,10 @@ import { ApplicationsController } from './interface/applications.controller';
  * the API Keys module can verify application ownership.
  */
 @Module({
-  controllers: [ApplicationsController],
+  controllers: [ApplicationsController, PublicApplicationsController],
   providers: [
     CreateApplicationUseCase,
+    ListPublicApplicationsUseCase,
     ListApplicationsUseCase,
     GetApplicationUseCase,
     UpdateApplicationUseCase,

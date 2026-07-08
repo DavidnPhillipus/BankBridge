@@ -45,6 +45,14 @@ export class PrismaApplicationRepository implements ApplicationRepository {
     return records.map((r) => this.toDomain(r));
   }
 
+  async findAllActive(): Promise<Application[]> {
+    const records = await this.prisma.application.findMany({
+      where: { isActive: true },
+      orderBy: { name: 'asc' },
+    });
+    return records.map((r) => this.toDomain(r));
+  }
+
   async findById(id: string): Promise<Application | null> {
     const record = await this.prisma.application.findUnique({ where: { id } });
     return record ? this.toDomain(record) : null;

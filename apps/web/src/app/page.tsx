@@ -28,8 +28,8 @@ export default function LandingPage(): React.ReactElement {
           </a>
         </div>
         <p className="mt-16 text-sm text-muted-foreground">
-          Scaffold ready — dashboard, analytics, and developer portal coming in
-          later steps.
+          Demo: sign in as <code className="text-primary">customer@bankbridge.na</code> /{' '}
+          <code className="text-primary">Customer123!</code>
         </p>
       </div>
     </main>

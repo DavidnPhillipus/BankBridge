@@ -1,3 +1,4 @@
+import { AppProviders } from '@/providers/app-providers';
 import type { Metadata } from 'next';
 import './globals.css';
 
@@ -12,7 +13,9 @@ export default function RootLayout({
 }: Readonly<{ children: React.ReactNode }>): React.ReactElement {
   return (
     <html lang="en" className="dark" suppressHydrationWarning>
-      <body>{children}</body>
+      <body>
+        <AppProviders>{children}</AppProviders>
+      </body>
     </html>
   );
 }
