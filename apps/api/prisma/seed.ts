@@ -1,7 +1,11 @@
-import { CategoryType, PrismaClient, Role } from '@prisma/client';
+import { CategoryType, ConsentScope, PrismaClient, Role } from '@prisma/client';
 import * as bcrypt from 'bcrypt';
 
 const prisma = new PrismaClient();
+
+// Stable id for the first-party dashboard application so re-seeds are idempotent.
+const DEMO_APP_ID = '00000000-0000-4000-8000-000000000001';
+const DAY_MS = 24 * 60 * 60 * 1000;
 
 // The four simulated Namibian banks. `adapterKey` links each to its mock
 // adapter implementation (built in Step 6).
@@ -121,6 +125,46 @@ async function seedCategories(): Promise<void> {
   console.log(`Seeded ${CATEGORIES.length} categories`);
 }
 
+async function seedApplication(ownerId: string): Promise<string> {
+  await prisma.application.upsert({
+    where: { id: DEMO_APP_ID },
+    update: { name: 'BankBridge Dashboard', ownerId },
+    create: {
+      id: DEMO_APP_ID,
+      ownerId,
+      name: 'BankBridge Dashboard',
+      description: 'First-party dashboard application',
+      environment: 'SANDBOX',
+      redirectUris: [],
+    },
+  });
+  // eslint-disable-next-line no-console
+  console.log('Seeded demo application: BankBridge Dashboard');
+  return DEMO_APP_ID;
+}
+
+async function seedConsents(userId: string, applicationId: string): Promise<void> {
+  const targetKeys = ['bank_windhoek', 'fnb_namibia', 'nedbank_namibia'];
+  const banks = await prisma.bank.findMany({
+    where: { adapterKey: { in: targetKeys } },
+  });
+  // Idempotent: clear this user's consents for the demo app, then recreate.
+  await prisma.consent.deleteMany({ where: { userId, applicationId } });
+  const scopes: ConsentScope[] = [
+    ConsentScope.ACCOUNTS_READ,
+    ConsentScope.BALANCES_READ,
+    ConsentScope.TRANSACTIONS_READ,
+  ];
+  const expiresAt = new Date(Date.now() + 90 * DAY_MS);
+  for (const bank of banks) {
+    await prisma.consent.create({
+      data: { userId, applicationId, bankId: bank.id, scopes, status: 'ACTIVE', expiresAt },
+    });
+  }
+  // eslint-disable-next-line no-console
+  console.log(`Seeded ${banks.length} consents for demo customer`);
+}
+
 async function main(): Promise<void> {
   await upsertUser({
     email: 'admin@bankbridge.na',
@@ -146,6 +190,15 @@ async function main(): Promise<void> {
 
   await seedBanks();
   await seedCategories();
+
+  const [dev, customer] = await Promise.all([
+    prisma.user.findUnique({ where: { email: 'dev@bankbridge.na' } }),
+    prisma.user.findUnique({ where: { email: 'customer@bankbridge.na' } }),
+  ]);
+  if (dev && customer) {
+    const appId = await seedApplication(dev.id);
+    await seedConsents(customer.id, appId);
+  }
 }
 
 main()

@@ -1,9 +1,26 @@
 import { Module } from '@nestjs/common';
+import { ConsentAccessService } from './application/consent-access.service';
+import { GrantConsentUseCase } from './application/grant-consent.use-case';
+import { ListConsentsUseCase } from './application/list-consents.use-case';
+import { RevokeConsentUseCase } from './application/revoke-consent.use-case';
+import { CONSENT_REPOSITORY } from './domain/consent-repository.port';
+import { PrismaConsentRepository } from './infrastructure/prisma-consent.repository';
+import { ConsentController } from './interface/consent.controller';
 
 /**
- * Consent Management: grant / revoke / list scopes. Gates all data access.
- * OAuth2-ready seam: today platform-native consent records, later an
- * authorization-code grant without changing downstream consumers.
+ * Consent Management: grant / revoke / list, plus ConsentAccessService — the
+ * gate the accounts, transactions, and analytics modules use to ensure no bank
+ * data is ever fetched without an effective consent + the required scope.
  */
-@Module({})
+@Module({
+  controllers: [ConsentController],
+  providers: [
+    GrantConsentUseCase,
+    RevokeConsentUseCase,
+    ListConsentsUseCase,
+    ConsentAccessService,
+    { provide: CONSENT_REPOSITORY, useClass: PrismaConsentRepository },
+  ],
+  exports: [ConsentAccessService],
+})
 export class ConsentModule {}
