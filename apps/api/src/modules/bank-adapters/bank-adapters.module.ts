@@ -3,7 +3,9 @@ import { BankAdapterRegistry } from './application/bank-adapter-registry.service
 import { BANK_ADAPTERS, type BankAdapterPort } from './domain/bank-adapter.port';
 import { MockDataFactory } from './infrastructure/mock/mock-data.factory';
 import { BankWindhoekAdapter } from './infrastructure/mock/bank-windhoek.adapter';
+import { BankOfNamibiaAdapter } from './infrastructure/mock/bank-of-namibia.adapter';
 import { FnbNamibiaAdapter } from './infrastructure/mock/fnb-namibia.adapter';
+import { NampostAdapter } from './infrastructure/mock/nampost.adapter';
 import { StandardBankNamibiaAdapter } from './infrastructure/mock/standard-bank-namibia.adapter';
 import { NedbankNamibiaAdapter } from './infrastructure/mock/nedbank-namibia.adapter';
 
@@ -18,7 +20,9 @@ import { NedbankNamibiaAdapter } from './infrastructure/mock/nedbank-namibia.ada
   providers: [
     MockDataFactory,
     BankWindhoekAdapter,
+    BankOfNamibiaAdapter,
     FnbNamibiaAdapter,
+    NampostAdapter,
     StandardBankNamibiaAdapter,
     NedbankNamibiaAdapter,
     {
@@ -26,7 +30,9 @@ import { NedbankNamibiaAdapter } from './infrastructure/mock/nedbank-namibia.ada
       useFactory: (...adapters: BankAdapterPort[]): BankAdapterPort[] => adapters,
       inject: [
         BankWindhoekAdapter,
+        BankOfNamibiaAdapter,
         FnbNamibiaAdapter,
+        NampostAdapter,
         StandardBankNamibiaAdapter,
         NedbankNamibiaAdapter,
       ],

@@ -5,8 +5,8 @@ const prisma = new PrismaClient();
 
 // The four simulated Namibian banks. `adapterKey` links each to its mock
 // adapter implementation (built in Step 6).
-// logoUrl points at /public/banks/<slug>.png in the web app. Drop the bank
-// logo images there (named by slug) and they render automatically.
+// logoUrl points at /public/banks/<slug>.<ext> in the web app. The bank logo
+// images live there (named by slug) and render automatically.
 const BANKS = [
   {
     adapterKey: 'bank_windhoek',
@@ -16,11 +16,25 @@ const BANKS = [
     logoUrl: '/banks/bank-windhoek.png',
   },
   {
+    adapterKey: 'bank_of_namibia',
+    name: 'Bank of Namibia',
+    slug: 'bank-of-namibia',
+    primaryColor: '#1D4E89',
+    logoUrl: '/banks/bank-of-namibia.png',
+  },
+  {
     adapterKey: 'fnb_namibia',
     name: 'FNB Namibia',
     slug: 'fnb-namibia',
     primaryColor: '#008752',
     logoUrl: '/banks/fnb-namibia.png',
+  },
+  {
+    adapterKey: 'nampost',
+    name: 'NamPost',
+    slug: 'nampost',
+    primaryColor: '#E4002B',
+    logoUrl: '/banks/nampost.jpg',
   },
   {
     adapterKey: 'standard_bank_namibia',
@@ -87,6 +101,10 @@ async function seedBanks(): Promise<void> {
       create: { ...bank, country: 'NA', isActive: true },
     });
   }
+  // Remove any banks that are no longer part of the supported set.
+  await prisma.bank.deleteMany({
+    where: { adapterKey: { notIn: BANKS.map((b) => b.adapterKey) } },
+  });
   // eslint-disable-next-line no-console
   console.log(`Seeded ${BANKS.length} banks`);
 }
