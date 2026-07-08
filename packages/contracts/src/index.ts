@@ -7,3 +7,4 @@
  * are added in their respective build steps.
  */
 export * from './common/roles';
+export * from './auth';

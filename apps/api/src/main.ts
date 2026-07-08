@@ -1,6 +1,7 @@
 import { NestFactory } from '@nestjs/core';
-import { ValidationPipe, VersioningType } from '@nestjs/common';
+import { VersioningType } from '@nestjs/common';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
+import { ZodValidationPipe, patchNestJsSwagger } from 'nestjs-zod';
 import { AppModule } from './app.module';
 
 async function bootstrap(): Promise<void> {
@@ -13,18 +14,16 @@ async function bootstrap(): Promise<void> {
     defaultVersion: '1',
   });
 
-  app.useGlobalPipes(
-    new ValidationPipe({
-      whitelist: true,
-      transform: true,
-      forbidNonWhitelisted: true,
-    }),
-  );
+  // Validate every request body/query against its Zod schema (shared contracts).
+  app.useGlobalPipes(new ZodValidationPipe());
 
   app.enableCors({
     origin: process.env.WEB_ORIGIN?.split(',') ?? ['http://localhost:3000'],
     credentials: true,
   });
+
+  // Teach Swagger how to render Zod-backed DTOs.
+  patchNestJsSwagger();
 
   const swaggerConfig = new DocumentBuilder()
     .setTitle('BankBridge API')

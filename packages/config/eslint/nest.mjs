@@ -18,5 +18,8 @@ export default tseslint.config(...base, {
     '@typescript-eslint/interface-name-prefix': 'off',
     '@typescript-eslint/explicit-function-return-type': 'off',
     '@typescript-eslint/explicit-module-boundary-types': 'off',
+    // Constructor-injected classes must stay runtime imports so
+    // emitDecoratorMetadata can resolve DI tokens. `import type` would break it.
+    '@typescript-eslint/consistent-type-imports': 'off',
   },
 });

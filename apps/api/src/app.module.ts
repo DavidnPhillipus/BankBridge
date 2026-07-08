@@ -1,6 +1,9 @@
 import { Module } from '@nestjs/common';
+import { APP_GUARD } from '@nestjs/core';
 import { ConfigModule } from '@nestjs/config';
-import { ThrottlerModule } from '@nestjs/throttler';
+import { ThrottlerGuard, ThrottlerModule } from '@nestjs/throttler';
+
+import { PrismaModule } from './shared/prisma/prisma.module';
 
 // Feature modules (Clean Architecture: each is independent and self-contained).
 // Modules are scaffolded empty in Step 2 and implemented one-by-one in later steps.
@@ -24,6 +27,7 @@ import { AdminModule } from './modules/admin/admin.module';
   imports: [
     ConfigModule.forRoot({ isGlobal: true }),
     ThrottlerModule.forRoot([{ ttl: 60_000, limit: 100 }]),
+    PrismaModule,
 
     AuthModule,
     UsersModule,
@@ -40,6 +44,10 @@ import { AdminModule } from './modules/admin/admin.module';
     ApiKeysModule,
     AuditLogsModule,
     AdminModule,
+  ],
+  providers: [
+    // Global rate limiting (defense against brute-force on auth endpoints).
+    { provide: APP_GUARD, useClass: ThrottlerGuard },
   ],
 })
 export class AppModule {}
