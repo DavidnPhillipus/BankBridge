@@ -5,6 +5,7 @@ import {
   transactionStatusSchema,
   transactionTypeSchema,
 } from '../common/enums';
+import { paginationMetaSchema } from './platform';
 
 /** A supported financial institution. */
 export const bankSchema = z.object({
@@ -71,3 +72,10 @@ export const transactionSchema = z.object({
   bookedAt: z.string(), // ISO 8601
 });
 export type Transaction = z.infer<typeof transactionSchema>;
+
+/** Paginated transactions envelope (GET /accounts/:id/transactions). */
+export const transactionPageSchema = z.object({
+  data: z.array(transactionSchema),
+  meta: paginationMetaSchema,
+});
+export type TransactionPage = z.infer<typeof transactionPageSchema>;
