@@ -6,6 +6,9 @@ import {
   NotFoundException,
 } from '@nestjs/common';
 import type { Consent as ConsentDto, CreateConsentInput } from '@bankbridge/contracts';
+import { AuditAction } from '../../audit-logs/domain/audit-actions';
+import { AuditLogService } from '../../audit-logs/application/audit-log.service';
+import { NotificationService } from '../../notifications/application/notification.service';
 import {
   CONSENT_REPOSITORY,
   type ConsentRepository,
@@ -18,6 +21,8 @@ const DAY_MS = 24 * 60 * 60 * 1000;
 export class GrantConsentUseCase {
   constructor(
     @Inject(CONSENT_REPOSITORY) private readonly consents: ConsentRepository,
+    private readonly audit: AuditLogService,
+    private readonly notifications: NotificationService,
   ) {}
 
   async execute(userId: string, input: CreateConsentInput): Promise<ConsentDto> {
@@ -54,6 +59,27 @@ export class GrantConsentUseCase {
       scopes: input.scopes,
       expiresAt,
     });
-    return consent.toDto();
+
+    const dto = consent.toDto();
+    await Promise.all([
+      this.audit.record({
+        actorId: userId,
+        action: AuditAction.CONSENT_GRANT,
+        resourceType: 'consent',
+        resourceId: dto.id,
+        metadata: {
+          bankId: dto.bankId,
+          applicationId: dto.applicationId,
+          scopes: dto.scopes,
+        },
+      }),
+      this.notifications.notifyConsentGranted(
+        userId,
+        dto.applicationName,
+        dto.bankName,
+      ),
+    ]);
+
+    return dto;
   }
 }

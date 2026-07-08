@@ -5,9 +5,14 @@ import {
   HttpCode,
   HttpStatus,
   Post,
+  Req,
 } from '@nestjs/common';
 import { ApiBearerAuth, ApiOperation, ApiTags } from '@nestjs/swagger';
+import type { Request } from 'express';
 import type { AuthResponse, AuthUser } from '@bankbridge/contracts';
+import { AuditLogService } from '../../audit-logs/application/audit-log.service';
+import { AuditAction } from '../../audit-logs/domain/audit-actions';
+import { auditMetaFromRequest } from '../../audit-logs/interface/audit-request.util';
 import { GetCurrentUserUseCase } from '../application/get-current-user.use-case';
 import { LoginUseCase } from '../application/login.use-case';
 import { LogoutUseCase } from '../application/logout.use-case';
@@ -26,21 +31,40 @@ export class AuthController {
     private readonly refreshUseCase: RefreshTokenUseCase,
     private readonly logoutUseCase: LogoutUseCase,
     private readonly getCurrentUserUseCase: GetCurrentUserUseCase,
+    private readonly audit: AuditLogService,
   ) {}
 
   @Public()
   @Post('register')
   @ApiOperation({ summary: 'Register a new customer account' })
-  register(@Body() dto: RegisterDto): Promise<AuthResponse> {
-    return this.registerUseCase.execute(dto);
+  async register(@Body() dto: RegisterDto, @Req() req: Request): Promise<AuthResponse> {
+    const result = await this.registerUseCase.execute(dto);
+    const meta = auditMetaFromRequest(req);
+    await this.audit.record({
+      actorId: result.user.id,
+      action: AuditAction.AUTH_REGISTER,
+      resourceType: 'user',
+      resourceId: result.user.id,
+      ...meta,
+    });
+    return result;
   }
 
   @Public()
   @Post('login')
   @HttpCode(HttpStatus.OK)
   @ApiOperation({ summary: 'Authenticate and receive access + refresh tokens' })
-  login(@Body() dto: LoginDto): Promise<AuthResponse> {
-    return this.loginUseCase.execute(dto);
+  async login(@Body() dto: LoginDto, @Req() req: Request): Promise<AuthResponse> {
+    const result = await this.loginUseCase.execute(dto);
+    const meta = auditMetaFromRequest(req);
+    await this.audit.record({
+      actorId: result.user.id,
+      action: AuditAction.AUTH_LOGIN,
+      resourceType: 'user',
+      resourceId: result.user.id,
+      ...meta,
+    });
+    return result;
   }
 
   @Public()
@@ -55,8 +79,19 @@ export class AuthController {
   @HttpCode(HttpStatus.NO_CONTENT)
   @ApiBearerAuth()
   @ApiOperation({ summary: 'Revoke all refresh tokens for the current user' })
-  async logout(@CurrentUser('id') userId: string): Promise<void> {
+  async logout(
+    @CurrentUser('id') userId: string,
+    @Req() req: Request,
+  ): Promise<void> {
     await this.logoutUseCase.execute(userId);
+    const meta = auditMetaFromRequest(req);
+    await this.audit.record({
+      actorId: userId,
+      action: AuditAction.AUTH_LOGOUT,
+      resourceType: 'user',
+      resourceId: userId,
+      ...meta,
+    });
   }
 
   @Get('me')

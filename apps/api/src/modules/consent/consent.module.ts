@@ -1,4 +1,6 @@
 import { Module } from '@nestjs/common';
+import { AuditLogsModule } from '../audit-logs/audit-logs.module';
+import { NotificationsModule } from '../notifications/notifications.module';
 import { ConsentAccessService } from './application/consent-access.service';
 import { GrantConsentUseCase } from './application/grant-consent.use-case';
 import { ListConsentsUseCase } from './application/list-consents.use-case';
@@ -13,6 +15,7 @@ import { ConsentController } from './interface/consent.controller';
  * data is ever fetched without an effective consent + the required scope.
  */
 @Module({
+  imports: [AuditLogsModule, NotificationsModule],
   controllers: [ConsentController],
   providers: [
     GrantConsentUseCase,

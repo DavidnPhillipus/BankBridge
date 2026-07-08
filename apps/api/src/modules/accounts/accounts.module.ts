@@ -1,6 +1,7 @@
 import { Module } from '@nestjs/common';
 import { ApiGatewayModule } from '../api-gateway/api-gateway.module';
 import { ConsentModule } from '../consent/consent.module';
+import { NotificationsModule } from '../notifications/notifications.module';
 import { GetAccountBalanceUseCase } from './application/get-account-balance.use-case';
 import { GetAccountUseCase } from './application/get-account.use-case';
 import { SyncAccountsUseCase } from './application/sync-accounts.use-case';
@@ -14,7 +15,7 @@ import { AccountsController } from './interface/accounts.controller';
  * (ApiGatewayModule) normalizes each bank's dialect before persistence.
  */
 @Module({
-  imports: [ConsentModule, ApiGatewayModule],
+  imports: [ConsentModule, ApiGatewayModule, NotificationsModule],
   controllers: [AccountsController],
   providers: [
     SyncAccountsUseCase,

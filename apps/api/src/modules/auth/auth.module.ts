@@ -3,6 +3,7 @@ import { APP_GUARD } from '@nestjs/core';
 import { JwtModule } from '@nestjs/jwt';
 import { PassportModule } from '@nestjs/passport';
 
+import { AuditLogsModule } from '../audit-logs/audit-logs.module';
 import { UsersModule } from '../users/users.module';
 
 import { GetCurrentUserUseCase } from './application/get-current-user.use-case';
@@ -26,7 +27,7 @@ import { RolesGuard } from './interface/guards/roles.guard';
 import { JwtStrategy } from './interface/strategies/jwt.strategy';
 
 @Module({
-  imports: [UsersModule, PassportModule, JwtModule.register({})],
+  imports: [UsersModule, AuditLogsModule, PassportModule, JwtModule.register({})],
   controllers: [AuthController],
   providers: [
     // Application use-cases

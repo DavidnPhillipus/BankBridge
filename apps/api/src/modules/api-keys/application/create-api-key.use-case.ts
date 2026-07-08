@@ -1,5 +1,7 @@
 import { Inject, Injectable, NotFoundException } from '@nestjs/common';
 import type { CreateApiKeyInput, CreatedApiKey } from '@bankbridge/contracts';
+import { AuditAction } from '../../audit-logs/domain/audit-actions';
+import { AuditLogService } from '../../audit-logs/application/audit-log.service';
 import {
   APPLICATION_REPOSITORY,
   type ApplicationRepository,
@@ -18,6 +20,7 @@ export class CreateApiKeyUseCase {
     @Inject(API_KEY_REPOSITORY) private readonly apiKeys: ApiKeyRepository,
     @Inject(APPLICATION_REPOSITORY)
     private readonly applications: ApplicationRepository,
+    private readonly audit: AuditLogService,
   ) {}
 
   async execute(ownerId: string, input: CreateApiKeyInput): Promise<CreatedApiKey> {
@@ -42,6 +45,18 @@ export class CreateApiKeyUseCase {
       scopes: input.scopes,
       environment: application.toDto().environment,
       expiresAt,
+    });
+
+    await this.audit.record({
+      actorId: ownerId,
+      action: AuditAction.API_KEY_CREATE,
+      resourceType: 'api_key',
+      resourceId: apiKey.id,
+      metadata: {
+        applicationId: input.applicationId,
+        keyPrefix: generated.prefix,
+        scopes: input.scopes,
+      },
     });
 
     // The secret is returned exactly once and never persisted in plaintext.

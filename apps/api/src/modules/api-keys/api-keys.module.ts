@@ -1,4 +1,5 @@
 import { Module } from '@nestjs/common';
+import { AuditLogsModule } from '../audit-logs/audit-logs.module';
 import { DeveloperPortalModule } from '../developer-portal/developer-portal.module';
 import { ApiKeyAuthService } from './application/api-key-auth.service';
 import { CreateApiKeyUseCase } from './application/create-api-key.use-case';
@@ -14,7 +15,7 @@ import { ApiKeysController } from './interface/api-keys.controller';
  * lookup). Exports API_KEY_REPOSITORY for the public API auth guard (Step 14).
  */
 @Module({
-  imports: [DeveloperPortalModule],
+  imports: [DeveloperPortalModule, AuditLogsModule],
   controllers: [ApiKeysController],
   providers: [
     CreateApiKeyUseCase,

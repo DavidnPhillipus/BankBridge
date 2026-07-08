@@ -1,6 +1,7 @@
 import { Inject, Injectable, NotFoundException } from '@nestjs/common';
 import type { AccountBalance } from '@bankbridge/contracts';
 import { GatewayService } from '../../api-gateway/application/gateway.service';
+import { NotificationService } from '../../notifications/application/notification.service';
 import { ConsentAccessService } from '../../consent/application/consent-access.service';
 import {
   ACCOUNT_REPOSITORY,
@@ -18,6 +19,7 @@ export class GetAccountBalanceUseCase {
     private readonly consentAccess: ConsentAccessService,
     private readonly gateway: GatewayService,
     @Inject(ACCOUNT_REPOSITORY) private readonly accounts: AccountRepository,
+    private readonly notifications: NotificationService,
   ) {}
 
   async execute(
@@ -50,6 +52,11 @@ export class GetAccountBalanceUseCase {
         balance.current,
         balance.available,
       );
+      await this.notifications.checkLowBalance(
+        userId,
+        `${updated.toDto().bankName} ${updated.toDto().name}`,
+        balance.available,
+      );
       return {
         accountId: updated.id,
         currency: updated.currency,
@@ -59,6 +66,11 @@ export class GetAccountBalanceUseCase {
     }
 
     const dto = account.toDto();
+    await this.notifications.checkLowBalance(
+      userId,
+      `${dto.bankName} ${dto.name}`,
+      dto.availableBalance,
+    );
     return {
       accountId: dto.id,
       currency: dto.currency,

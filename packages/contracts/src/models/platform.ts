@@ -88,3 +88,15 @@ export const paginationMetaSchema = z.object({
   totalPages: z.number(),
 });
 export type PaginationMeta = z.infer<typeof paginationMetaSchema>;
+
+/** Paginated notifications envelope. */
+export const notificationPageSchema = z.object({
+  data: z.array(notificationSchema),
+  meta: paginationMetaSchema,
+});
+export type NotificationPage = z.infer<typeof notificationPageSchema>;
+
+export const unreadCountSchema = z.object({
+  count: z.number().int().nonnegative(),
+});
+export type UnreadCount = z.infer<typeof unreadCountSchema>;
