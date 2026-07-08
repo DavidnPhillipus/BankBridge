@@ -32,6 +32,15 @@ export const accountSchema = z.object({
 });
 export type Account = z.infer<typeof accountSchema>;
 
+/** Live balance for a single account (GET /accounts/:id/balance). */
+export const accountBalanceSchema = z.object({
+  accountId: z.string().uuid(),
+  currency: z.string(),
+  balance: z.number(),
+  availableBalance: z.number(),
+});
+export type AccountBalance = z.infer<typeof accountBalanceSchema>;
+
 export const categorySchema = z.object({
   id: z.string().uuid(),
   name: z.string(),

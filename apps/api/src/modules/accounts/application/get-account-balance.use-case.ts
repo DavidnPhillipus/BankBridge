@@ -1,0 +1,64 @@
+import { Inject, Injectable, NotFoundException } from '@nestjs/common';
+import type { AccountBalance } from '@bankbridge/contracts';
+import { GatewayService } from '../../api-gateway/application/gateway.service';
+import { ConsentAccessService } from '../../consent/application/consent-access.service';
+import {
+  ACCOUNT_REPOSITORY,
+  type AccountRepository,
+} from '../domain/account-repository.port';
+
+/**
+ * Fetches a live balance for one account through the gateway, gated by a
+ * BALANCES_READ consent for that account's bank, then refreshes the stored
+ * balance. Falls back to the persisted balance if the bank returns nothing.
+ */
+@Injectable()
+export class GetAccountBalanceUseCase {
+  constructor(
+    private readonly consentAccess: ConsentAccessService,
+    private readonly gateway: GatewayService,
+    @Inject(ACCOUNT_REPOSITORY) private readonly accounts: AccountRepository,
+  ) {}
+
+  async execute(userId: string, accountId: string): Promise<AccountBalance> {
+    const account = await this.accounts.findByIdForUser(userId, accountId);
+    if (!account) {
+      throw new NotFoundException('Account not found');
+    }
+
+    const bank = await this.consentAccess.assertBankScope(
+      userId,
+      account.bankId,
+      'BALANCES_READ',
+    );
+
+    const ctx = { customerRef: userId };
+    const balance = await this.gateway.getBalance(
+      bank.adapterKey,
+      ctx,
+      account.externalId,
+    );
+
+    if (balance) {
+      const updated = await this.accounts.updateBalance(
+        account.id,
+        balance.current,
+        balance.available,
+      );
+      return {
+        accountId: updated.id,
+        currency: updated.currency,
+        balance: balance.current,
+        availableBalance: balance.available,
+      };
+    }
+
+    const dto = account.toDto();
+    return {
+      accountId: dto.id,
+      currency: dto.currency,
+      balance: dto.balance,
+      availableBalance: dto.availableBalance,
+    };
+  }
+}
