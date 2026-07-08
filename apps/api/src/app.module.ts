@@ -21,6 +21,7 @@ import { AiInsightsModule } from './modules/ai-insights/ai-insights.module';
 import { NotificationsModule } from './modules/notifications/notifications.module';
 import { DeveloperPortalModule } from './modules/developer-portal/developer-portal.module';
 import { ApiKeysModule } from './modules/api-keys/api-keys.module';
+import { PublicApiModule } from './modules/public-api/public-api.module';
 import { AuditLogsModule } from './modules/audit-logs/audit-logs.module';
 import { AdminModule } from './modules/admin/admin.module';
 
@@ -44,6 +45,7 @@ import { AdminModule } from './modules/admin/admin.module';
     NotificationsModule,
     DeveloperPortalModule,
     ApiKeysModule,
+    PublicApiModule,
     AuditLogsModule,
     AdminModule,
   ],

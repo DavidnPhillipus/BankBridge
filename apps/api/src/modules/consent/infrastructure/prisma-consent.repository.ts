@@ -62,12 +62,47 @@ export class PrismaConsentRepository implements ConsentRepository {
     return records.map((r) => this.toDomain(r));
   }
 
+  async findActiveByUserAndApplication(
+    userId: string,
+    applicationId: string,
+  ): Promise<Consent[]> {
+    const records = await this.prisma.consent.findMany({
+      where: {
+        userId,
+        applicationId,
+        status: 'ACTIVE',
+        expiresAt: { gt: new Date() },
+      },
+      include: consentInclude,
+      orderBy: { createdAt: 'desc' },
+    });
+    return records.map((r) => this.toDomain(r));
+  }
+
   async findEffectiveByUserBank(
     userId: string,
     bankId: string,
   ): Promise<Consent | null> {
     const record = await this.prisma.consent.findFirst({
       where: { userId, bankId, status: 'ACTIVE', expiresAt: { gt: new Date() } },
+      include: consentInclude,
+    });
+    return record ? this.toDomain(record) : null;
+  }
+
+  async findEffectiveByUserBankAndApplication(
+    userId: string,
+    bankId: string,
+    applicationId: string,
+  ): Promise<Consent | null> {
+    const record = await this.prisma.consent.findFirst({
+      where: {
+        userId,
+        bankId,
+        applicationId,
+        status: 'ACTIVE',
+        expiresAt: { gt: new Date() },
+      },
       include: consentInclude,
     });
     return record ? this.toDomain(record) : null;

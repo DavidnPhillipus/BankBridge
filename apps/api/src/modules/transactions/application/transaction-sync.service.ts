@@ -26,7 +26,12 @@ export class TransactionSyncService {
     private readonly transactions: TransactionRepository,
   ) {}
 
-  async sync(userId: string, accountId: string, force = false): Promise<number> {
+  async sync(
+    userId: string,
+    accountId: string,
+    force = false,
+    applicationId?: string,
+  ): Promise<number> {
     const account = await this.accounts.findByIdForUser(userId, accountId);
     if (!account) {
       throw new NotFoundException('Account not found');
@@ -36,6 +41,7 @@ export class TransactionSyncService {
       userId,
       account.bankId,
       'TRANSACTIONS_READ',
+      applicationId,
     );
 
     const ctx = { customerRef: userId };

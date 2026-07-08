@@ -30,8 +30,19 @@ export interface ConsentRepository {
   findManyByUser(userId: string, status?: ConsentStatus): Promise<Consent[]>;
   /** Active (ACTIVE + unexpired) consents for a user. */
   findActiveByUser(userId: string): Promise<Consent[]>;
+  /** Active consents for a user granted to a specific application (public API). */
+  findActiveByUserAndApplication(
+    userId: string,
+    applicationId: string,
+  ): Promise<Consent[]>;
   /** Existing effective consent for a user+bank, if any (used to avoid dupes). */
   findEffectiveByUserBank(userId: string, bankId: string): Promise<Consent | null>;
+  /** Effective consent for user+bank+application (public API gate). */
+  findEffectiveByUserBankAndApplication(
+    userId: string,
+    bankId: string,
+    applicationId: string,
+  ): Promise<Consent | null>;
   revoke(id: string): Promise<void>;
 
   // Lookups used for validation + denormalized names.

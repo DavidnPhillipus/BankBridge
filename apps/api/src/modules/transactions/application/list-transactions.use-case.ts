@@ -11,6 +11,7 @@ export interface ListTransactionsInput {
   pageSize: number;
   since?: Date;
   force?: boolean;
+  applicationId?: string;
 }
 
 @Injectable()
@@ -28,7 +29,12 @@ export class ListTransactionsUseCase {
   ): Promise<TransactionPage> {
     // Read-through: ensure the latest transactions are persisted first. The sync
     // also performs the owner + consent (TRANSACTIONS_READ) checks.
-    await this.sync.sync(userId, accountId, input.force ?? false);
+    await this.sync.sync(
+      userId,
+      accountId,
+      input.force ?? false,
+      input.applicationId,
+    );
 
     const { data, total } = await this.transactions.findPageByAccount(accountId, {
       page: input.page,

@@ -20,7 +20,11 @@ export class GetAccountBalanceUseCase {
     @Inject(ACCOUNT_REPOSITORY) private readonly accounts: AccountRepository,
   ) {}
 
-  async execute(userId: string, accountId: string): Promise<AccountBalance> {
+  async execute(
+    userId: string,
+    accountId: string,
+    applicationId?: string,
+  ): Promise<AccountBalance> {
     const account = await this.accounts.findByIdForUser(userId, accountId);
     if (!account) {
       throw new NotFoundException('Account not found');
@@ -30,6 +34,7 @@ export class GetAccountBalanceUseCase {
       userId,
       account.bankId,
       'BALANCES_READ',
+      applicationId,
     );
 
     const ctx = { customerRef: userId };

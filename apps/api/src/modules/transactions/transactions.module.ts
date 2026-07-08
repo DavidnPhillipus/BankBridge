@@ -21,6 +21,6 @@ import { TransactionsController } from './interface/transactions.controller';
     ListTransactionsUseCase,
     { provide: TRANSACTION_REPOSITORY, useClass: PrismaTransactionRepository },
   ],
-  exports: [TRANSACTION_REPOSITORY, TransactionSyncService],
+  exports: [TRANSACTION_REPOSITORY, TransactionSyncService, ListTransactionsUseCase],
 })
 export class TransactionsModule {}

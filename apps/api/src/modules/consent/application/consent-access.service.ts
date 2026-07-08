@@ -27,8 +27,11 @@ export class ConsentAccessService {
   async getConsentedBanks(
     userId: string,
     requiredScope?: ConsentScope,
+    applicationId?: string,
   ): Promise<ConsentedBank[]> {
-    const consents = await this.consents.findActiveByUser(userId);
+    const consents = applicationId
+      ? await this.consents.findActiveByUserAndApplication(userId, applicationId)
+      : await this.consents.findActiveByUser(userId);
     return consents
       .filter((c) => c.isEffective() && (!requiredScope || c.hasScope(requiredScope)))
       .map((c) => ({
@@ -41,14 +44,21 @@ export class ConsentAccessService {
 
   /**
    * Ensures the user has an effective consent for a bank with the given scope.
-   * Returns the resolved bank context, or throws 403.
+   * When applicationId is set (public API), consent must belong to that app.
    */
   async assertBankScope(
     userId: string,
     bankId: string,
     scope: ConsentScope,
+    applicationId?: string,
   ): Promise<ConsentedBank> {
-    const consent = await this.consents.findEffectiveByUserBank(userId, bankId);
+    const consent = applicationId
+      ? await this.consents.findEffectiveByUserBankAndApplication(
+          userId,
+          bankId,
+          applicationId,
+        )
+      : await this.consents.findEffectiveByUserBank(userId, bankId);
     if (!consent || !consent.isEffective() || !consent.hasScope(scope)) {
       throw new ForbiddenException(
         `No active consent granting "${scope}" for this bank`,

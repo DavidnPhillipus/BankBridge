@@ -1,5 +1,6 @@
 import { Module } from '@nestjs/common';
 import { DeveloperPortalModule } from '../developer-portal/developer-portal.module';
+import { ApiKeyAuthService } from './application/api-key-auth.service';
 import { CreateApiKeyUseCase } from './application/create-api-key.use-case';
 import { ListApiKeysUseCase } from './application/list-api-keys.use-case';
 import { RevokeApiKeyUseCase } from './application/revoke-api-key.use-case';
@@ -19,8 +20,9 @@ import { ApiKeysController } from './interface/api-keys.controller';
     CreateApiKeyUseCase,
     ListApiKeysUseCase,
     RevokeApiKeyUseCase,
+    ApiKeyAuthService,
     { provide: API_KEY_REPOSITORY, useClass: PrismaApiKeyRepository },
   ],
-  exports: [API_KEY_REPOSITORY],
+  exports: [API_KEY_REPOSITORY, ApiKeyAuthService],
 })
 export class ApiKeysModule {}

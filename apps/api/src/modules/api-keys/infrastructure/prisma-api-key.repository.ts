@@ -5,6 +5,7 @@ import {
 } from '@prisma/client';
 import type { AppEnvironment, ConsentScope } from '@bankbridge/contracts';
 import { PrismaService } from '../../../shared/prisma/prisma.service';
+import { KeyGenerator } from '../domain/key-generator';
 import { ApiKey } from '../domain/api-key.entity';
 import type {
   ApiKeyRepository,
@@ -59,6 +60,20 @@ export class PrismaApiKeyRepository implements ApiKeyRepository {
   async findByPrefix(keyPrefix: string): Promise<ApiKey | null> {
     const record = await this.prisma.apiKey.findUnique({ where: { keyPrefix } });
     return record ? this.toDomain(record) : null;
+  }
+
+  async verifyPresentedKey(fullKey: string): Promise<ApiKey | null> {
+    const prefix = KeyGenerator.extractPrefix(fullKey);
+    if (!prefix) return null;
+
+    const record = await this.prisma.apiKey.findUnique({ where: { keyPrefix: prefix } });
+    if (!record) return null;
+
+    const hash = KeyGenerator.hash(fullKey);
+    if (record.keyHash !== hash) return null;
+
+    const key = this.toDomain(record);
+    return key.isUsable() ? key : null;
   }
 
   async revoke(id: string): Promise<void> {

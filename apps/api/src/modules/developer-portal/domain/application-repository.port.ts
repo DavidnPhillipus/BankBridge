@@ -21,6 +21,7 @@ export interface UpdateApplicationData {
 export interface ApplicationRepository {
   create(data: CreateApplicationData): Promise<Application>;
   findByOwner(ownerId: string): Promise<Application[]>;
+  findById(id: string): Promise<Application | null>;
   findByIdForOwner(ownerId: string, id: string): Promise<Application | null>;
   update(id: string, data: UpdateApplicationData): Promise<Application>;
   delete(id: string): Promise<void>;

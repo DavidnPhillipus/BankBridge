@@ -24,8 +24,16 @@ export class SyncAccountsUseCase {
     @Inject(ACCOUNT_REPOSITORY) private readonly accounts: AccountRepository,
   ) {}
 
-  async execute(userId: string, force = false): Promise<AccountDto[]> {
-    const banks = await this.consentAccess.getConsentedBanks(userId, 'ACCOUNTS_READ');
+  async execute(
+    userId: string,
+    force = false,
+    applicationId?: string,
+  ): Promise<AccountDto[]> {
+    const banks = await this.consentAccess.getConsentedBanks(
+      userId,
+      'ACCOUNTS_READ',
+      applicationId,
+    );
     const ctx = { customerRef: userId };
 
     await Promise.all(
