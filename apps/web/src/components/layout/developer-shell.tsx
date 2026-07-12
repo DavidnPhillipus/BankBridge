@@ -1,6 +1,6 @@
 'use client';
 
-import { BookOpen, Code2, KeyRound, LayoutDashboard, Layers } from 'lucide-react';
+import { BookOpen, KeyRound, LayoutDashboard, Layers } from 'lucide-react';
 import { SidebarShell } from '@/components/layout/sidebar-shell';
 
 const navItems = [
@@ -12,12 +12,7 @@ const navItems = [
 
 export function DeveloperShell({ children }: { children: React.ReactNode }): React.ReactElement {
   return (
-    <SidebarShell
-      title="FinConnect"
-      subtitle="Developer portal"
-      icon={Code2}
-      navItems={navItems}
-    >
+    <SidebarShell subtitle="Developer portal" navItems={navItems}>
       {children}
     </SidebarShell>
   );

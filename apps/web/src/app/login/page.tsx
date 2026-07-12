@@ -7,6 +7,7 @@ import { loginSchema } from '@bankbridge/contracts';
 import { authApi } from '@/lib/api';
 import { useAuthStore } from '@/lib/auth-store';
 import { homePathForRole } from '@/lib/routing';
+import { FinConnectLogo } from '@/components/brand/finconnect-logo';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
@@ -52,7 +53,8 @@ export default function LoginPage(): React.ReactElement {
   }
 
   return (
-    <main className="flex min-h-screen items-center justify-center p-6">
+    <main className="flex min-h-screen flex-col items-center justify-center gap-6 p-6">
+      <FinConnectLogo href="/" size={44} theme="light" />
       <Card className="w-full max-w-md">
         <CardHeader>
           <div className="mb-2">

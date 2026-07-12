@@ -21,6 +21,7 @@ import {
   KeyRound,
 } from 'lucide-react';
 import { BankLogo } from '@/components/banks/bank-logo';
+import { FinConnectLogo } from '@/components/brand/finconnect-logo';
 import { SUPPORTED_BANKS } from '@/lib/banks';
 import { cn } from '@/lib/utils';
 
@@ -119,12 +120,7 @@ export function LandingPage(): React.ReactElement {
       {/* Hero */}
       <section className="relative overflow-hidden bg-[hsl(222_48%_8%)]">
         <header className="relative z-20 mx-auto flex h-16 max-w-6xl items-center justify-between px-6">
-          <Link href="/" className="flex items-center gap-2.5 text-white">
-            <span className="flex h-9 w-9 items-center justify-center rounded-md bg-[hsl(42_92%_48%)] text-sm font-bold text-[hsl(222_48%_12%)]">
-              FC
-            </span>
-            <span className="font-display text-xl font-semibold tracking-tight">FinConnect</span>
-          </Link>
+          <FinConnectLogo href="/" size={40} theme="dark" />
           <nav className="hidden items-center gap-8 text-sm text-white/70 md:flex">
             <a href="#platform" className="transition hover:text-white">
               Platform
@@ -438,10 +434,7 @@ X-API-Key: fc_live.xxxxxxxx
       <footer className="border-t border-border bg-white py-10">
         <div className="mx-auto flex max-w-6xl flex-col items-center justify-between gap-4 px-6 text-sm text-muted-foreground md:flex-row">
           <div className="flex items-center gap-2">
-            <span className="flex h-7 w-7 items-center justify-center rounded bg-[hsl(42_92%_48%)] text-xs font-bold text-[hsl(222_48%_12%)]">
-              FC
-            </span>
-            <span className="font-display text-foreground">FinConnect</span>
+            <FinConnectLogo size={28} theme="light" />
             <span>© {new Date().getFullYear()}</span>
           </div>
           <div className="flex gap-6">

@@ -1,6 +1,6 @@
 'use client';
 
-import { LayoutDashboard, ScrollText, Shield } from 'lucide-react';
+import { LayoutDashboard, ScrollText } from 'lucide-react';
 import { SidebarShell } from '@/components/layout/sidebar-shell';
 
 const navItems = [
@@ -10,7 +10,7 @@ const navItems = [
 
 export function AdminShell({ children }: { children: React.ReactNode }): React.ReactElement {
   return (
-    <SidebarShell title="FinConnect" subtitle="Platform admin" icon={Shield} navItems={navItems}>
+    <SidebarShell subtitle="Platform admin" navItems={navItems}>
       {children}
     </SidebarShell>
   );

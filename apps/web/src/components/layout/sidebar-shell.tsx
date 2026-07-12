@@ -4,6 +4,7 @@ import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
 import type { LucideIcon } from 'lucide-react';
 import { LogOut } from 'lucide-react';
+import { FinConnectLogo } from '@/components/brand/finconnect-logo';
 import { cn } from '@/lib/utils';
 import { useAuthStore } from '@/lib/auth-store';
 import { authApi } from '@/lib/api';
@@ -19,17 +20,13 @@ export interface NavItem {
 }
 
 interface SidebarShellProps {
-  title: string;
   subtitle: string;
-  icon: LucideIcon;
   navItems: NavItem[];
   children: React.ReactNode;
 }
 
 export function SidebarShell({
-  title,
   subtitle,
-  icon: BrandIcon,
   navItems,
   children,
 }: SidebarShellProps): React.ReactElement {
@@ -52,11 +49,8 @@ export function SidebarShell({
     <div className="flex min-h-screen bg-background">
       <aside className="hidden w-64 shrink-0 border-r border-border bg-card/40 lg:flex lg:flex-col">
         <div className="flex h-16 flex-col justify-center border-b border-border px-6">
-          <div className="flex items-center gap-2">
-            <BrandIcon className="h-6 w-6 text-primary" />
-            <span className="text-lg font-semibold">{title}</span>
-          </div>
-          <p className="text-xs text-muted-foreground">{subtitle}</p>
+          <FinConnectLogo href="/" size={32} theme="light" />
+          <p className="mt-1 text-xs text-muted-foreground">{subtitle}</p>
         </div>
         <nav className="flex-1 space-y-1 p-4">
           {navItems.map(({ href, label, icon: Icon, badge }) => {
@@ -104,7 +98,7 @@ export function SidebarShell({
 
       <div className="flex flex-1 flex-col">
         <header className="flex h-16 items-center justify-between border-b border-border px-6 lg:hidden">
-          <span className="font-semibold">{title}</span>
+          <FinConnectLogo size={28} theme="light" showWordmark={false} />
           <Button variant="ghost" size="sm" onClick={() => void logout()}>
             Sign out
           </Button>

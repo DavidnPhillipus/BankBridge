@@ -3,7 +3,6 @@
 import {
   ArrowLeftRight,
   Bell,
-  Building2,
   LayoutDashboard,
   Lightbulb,
   Shield,
@@ -35,12 +34,7 @@ export function CustomerShell({ children }: { children: React.ReactNode }): Reac
   ];
 
   return (
-    <SidebarShell
-      title="FinConnect"
-      subtitle="Personal banking"
-      icon={Building2}
-      navItems={navItems}
-    >
+    <SidebarShell subtitle="Personal banking" navItems={navItems}>
       {children}
     </SidebarShell>
   );
