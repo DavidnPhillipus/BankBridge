@@ -10,12 +10,14 @@ import {
 import { ApiBearerAuth, ApiOperation, ApiTags } from '@nestjs/swagger';
 import type { Account, AccountBalance } from '@bankbridge/contracts';
 import { CurrentUser } from '../../auth/interface/decorators/current-user.decorator';
+import { Roles } from '../../auth/interface/decorators/roles.decorator';
 import { GetAccountBalanceUseCase } from '../application/get-account-balance.use-case';
 import { GetAccountUseCase } from '../application/get-account.use-case';
 import { SyncAccountsUseCase } from '../application/sync-accounts.use-case';
 
 @ApiTags('Accounts')
 @ApiBearerAuth()
+@Roles('CUSTOMER')
 @Controller({ path: 'accounts', version: '1' })
 export class AccountsController {
   constructor(

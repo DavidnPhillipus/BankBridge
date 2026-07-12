@@ -1,341 +1,448 @@
+import Image from 'next/image';
 import Link from 'next/link';
 import {
   ArrowRight,
-  BarChart3,
   Building2,
-  KeyRound,
+  Briefcase,
+  Calculator,
+  ChartLine,
+  CheckCircle2,
+  Database,
+  Landmark,
   Lock,
+  PiggyBank,
+  Shield,
   ShieldCheck,
-  Sparkles,
-  Zap,
+  Smartphone,
+  User,
+  Wallet,
+  FileText,
+  Eye,
+  KeyRound,
 } from 'lucide-react';
-import { buttonVariants } from '@/components/ui/button';
+import { BankLogo } from '@/components/banks/bank-logo';
+import { SUPPORTED_BANKS } from '@/lib/banks';
 import { cn } from '@/lib/utils';
 
-const BANKS = [
-  { name: 'Bank Windhoek', slug: 'bank-windhoek', color: '#0033A0' },
-  { name: 'Bank of Namibia', slug: 'bank-of-namibia', color: '#1D4E89' },
-  { name: 'FNB Namibia', slug: 'fnb-namibia', color: '#008752' },
-  { name: 'NamPost', slug: 'nampost', color: '#E4002B' },
-  { name: 'Standard Bank', slug: 'standard-bank-namibia', color: '#0033A1' },
-  { name: 'Nedbank Namibia', slug: 'nedbank-namibia', color: '#006A4D' },
-] as const;
-
-const FEATURES = [
+const AUDIENCE_CARDS = [
   {
-    icon: Building2,
-    title: 'Unified bank connections',
-    description:
-      'Connect once to BankBridge and access accounts across every major Namibian bank through one standardized API.',
+    icon: Landmark,
+    title: 'Banks',
+    description: 'Expand your ecosystem and drive innovation.',
   },
   {
-    icon: Lock,
-    title: 'Consent-first access',
-    description:
-      'Customers grant granular, revocable permissions. Every data request is scoped, logged, and auditable.',
+    icon: Smartphone,
+    title: 'Fintechs',
+    description: 'Build powerful products faster and smarter.',
   },
   {
-    icon: Zap,
-    title: 'Real-time sync',
-    description:
-      'Balances and transactions flow through our gateway with intelligent caching — fast reads, fresh data on demand.',
+    icon: Briefcase,
+    title: 'Businesses',
+    description: 'Automate financial operations and grow.',
   },
   {
-    icon: BarChart3,
-    title: 'Spending analytics',
-    description:
-      'Automatic categorization, monthly snapshots, and trend charts help users understand where their money goes.',
+    icon: User,
+    title: 'Consumers',
+    description: 'Take control of your financial life.',
   },
   {
-    icon: Sparkles,
-    title: 'AI-powered insights',
-    description:
-      'Rule-based intelligence surfaces savings opportunities, unusual spending, and cash-flow patterns.',
-  },
-  {
-    icon: KeyRound,
-    title: 'Developer portal',
-    description:
-      'Register apps, issue API keys, and integrate in minutes with OpenAPI docs and a sandbox environment.',
+    icon: ShieldCheck,
+    title: 'Government',
+    description: 'Enable inclusive and transparent services.',
   },
 ] as const;
 
-const STEPS = [
-  {
-    step: '01',
-    title: 'Connect your bank',
-    description: 'Grant consent to link your Namibian bank account through our secure OAuth-style flow.',
-  },
-  {
-    step: '02',
-    title: 'Authorize apps',
-    description: 'Choose exactly which data each fintech app can access — accounts, balances, or transactions.',
-  },
-  {
-    step: '03',
-    title: 'Build & innovate',
-    description: 'Developers call one REST API to power budgeting tools, lending, payments, and more.',
-  },
+const POSSIBILITIES = [
+  { icon: Wallet, label: 'Budgeting Apps', color: 'bg-violet-500/20 text-violet-400' },
+  { icon: PiggyBank, label: 'Loan Platforms', color: 'bg-emerald-500/20 text-emerald-400' },
+  { icon: ChartLine, label: 'Investment Apps', color: 'bg-fuchsia-500/20 text-fuchsia-400' },
+  { icon: Calculator, label: 'Accounting Tools', color: 'bg-orange-500/20 text-orange-400' },
+  { icon: Shield, label: 'Insurance Services', color: 'bg-cyan-500/20 text-cyan-400' },
+  { icon: Building2, label: 'Payroll Systems', color: 'bg-blue-500/20 text-blue-400' },
 ] as const;
+
+const HOW_IT_WORKS = [
+  { icon: User, title: 'Connect', description: 'User connects their bank securely.' },
+  { icon: Shield, title: 'Authenticate', description: 'The bank authenticates the user.' },
+  { icon: CheckCircle2, title: 'Authorize', description: 'User grants permission for data access.' },
+  { icon: Database, title: 'Access', description: 'FinConnect securely retrieves the data.' },
+  { icon: ChartLine, title: 'Empower', description: 'Apps deliver insights and experiences.' },
+] as const;
+
+const DEV_FEATURES = [
+  'Easy integration',
+  'Comprehensive API docs',
+  'Sandbox environment',
+  'Real-time monitoring',
+  'Enterprise grade security',
+] as const;
+
+const SECURITY_FEATURES = [
+  { icon: Lock, title: 'End-to-End Encryption', side: 'left' },
+  { icon: CheckCircle2, title: 'User Consent', side: 'left' },
+  { icon: KeyRound, title: 'Strong Authentication', side: 'left' },
+  { icon: FileText, title: 'Audit Logs', side: 'right' },
+  { icon: Eye, title: 'Data Privacy', side: 'right' },
+  { icon: ShieldCheck, title: 'Compliance First', side: 'right' },
+] as const;
+
+function PurpleButton({
+  href,
+  children,
+  className,
+  variant = 'solid',
+}: {
+  href: string;
+  children: React.ReactNode;
+  className?: string;
+  variant?: 'solid' | 'ghost';
+}): React.ReactElement {
+  return (
+    <Link
+      href={href}
+      className={cn(
+        'inline-flex h-11 items-center gap-2 rounded-lg px-5 text-sm font-semibold transition',
+        variant === 'solid'
+          ? 'bg-[#5A39E1] text-white hover:bg-[#4A2FD0]'
+          : 'border border-white/25 bg-transparent text-white hover:bg-white/10',
+        className,
+      )}
+    >
+      {children}
+    </Link>
+  );
+}
 
 export function LandingPage(): React.ReactElement {
   return (
-    <div className="relative min-h-screen overflow-x-hidden">
-      <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_80%_50%_at_50%_-20%,hsl(var(--primary)/0.22),transparent)]" />
-      <div className="pointer-events-none absolute -right-40 top-1/3 h-96 w-96 rounded-full bg-primary/5 blur-3xl" />
-      <div className="pointer-events-none absolute -left-40 bottom-1/4 h-80 w-80 rounded-full bg-primary/5 blur-3xl" />
-
-      {/* Header */}
-      <header className="sticky top-0 z-50 border-b border-border/60 bg-background/80 backdrop-blur-md">
-        <div className="container mx-auto flex h-16 max-w-6xl items-center justify-between px-6">
-          <Link href="/" className="flex items-center gap-2 font-semibold tracking-tight">
-            <span className="flex h-8 w-8 items-center justify-center rounded-lg bg-primary text-sm font-bold text-primary-foreground">
-              BB
+    <div className="min-h-screen bg-white font-sans text-foreground">
+      {/* Hero */}
+      <section className="relative overflow-hidden bg-[hsl(222_48%_8%)]">
+        <header className="relative z-20 mx-auto flex h-16 max-w-6xl items-center justify-between px-6">
+          <Link href="/" className="flex items-center gap-2.5 text-white">
+            <span className="flex h-9 w-9 items-center justify-center rounded-md bg-[hsl(42_92%_48%)] text-sm font-bold text-[hsl(222_48%_12%)]">
+              FC
             </span>
-            BankBridge
+            <span className="font-display text-xl font-semibold tracking-tight">FinConnect</span>
           </Link>
-          <nav className="hidden items-center gap-8 text-sm text-muted-foreground md:flex">
-            <a href="#features" className="transition hover:text-foreground">
-              Features
+          <nav className="hidden items-center gap-8 text-sm text-white/70 md:flex">
+            <a href="#platform" className="transition hover:text-white">
+              Platform
             </a>
-            <a href="#banks" className="transition hover:text-foreground">
-              Banks
+            <a href="#solutions" className="transition hover:text-white">
+              Solutions
             </a>
-            <a href="#developers" className="transition hover:text-foreground">
+            <a href="#developers" className="transition hover:text-white">
               Developers
             </a>
-            <a
-              href="/docs"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="transition hover:text-foreground"
-            >
-              API docs
+            <a href="#about" className="transition hover:text-white">
+              About Us
             </a>
           </nav>
-          <div className="flex items-center gap-3">
-            <Link href="/login" className={cn(buttonVariants({ variant: 'ghost', size: 'sm' }))}>
-              Sign in
-            </Link>
-            <Link href="/register" className={cn(buttonVariants({ size: 'sm' }))}>
-              Get started
-            </Link>
-          </div>
-        </div>
-      </header>
+          <PurpleButton href="/register">Get Started</PurpleButton>
+        </header>
 
-      {/* Hero */}
-      <section className="container relative mx-auto max-w-6xl px-6 pb-20 pt-20 text-center md:pt-28">
-        <span className="mb-6 inline-flex items-center gap-2 rounded-full border border-border bg-secondary/40 px-4 py-1.5 text-sm text-muted-foreground">
-          <ShieldCheck className="h-4 w-4 text-primary" />
-          Open Banking Platform · Namibia
-        </span>
-        <h1 className="mx-auto max-w-4xl bg-gradient-to-b from-foreground to-muted-foreground bg-clip-text text-4xl font-semibold leading-tight tracking-tight text-transparent sm:text-5xl md:text-6xl">
-          One API for every bank in Namibia
-        </h1>
-        <p className="mx-auto mt-6 max-w-2xl text-lg text-muted-foreground md:text-xl">
-          BankBridge securely connects banks, customers, and fintech apps through a single
-          standardized API — consent-driven, auditable, and developer-first.
-        </p>
-        <div className="mt-10 flex flex-wrap items-center justify-center gap-4">
-          <Link href="/register" className={cn(buttonVariants({ size: 'lg' }))}>
-            Start for free
-            <ArrowRight className="h-4 w-4" />
-          </Link>
-          <Link href="/login" className={cn(buttonVariants({ variant: 'outline', size: 'lg' }))}>
-            View demo dashboard
-          </Link>
-        </div>
-        <p className="mt-8 text-sm text-muted-foreground">
-          Demo account:{' '}
-          <code className="rounded bg-secondary px-1.5 py-0.5 text-primary">customer@bankbridge.na</code>{' '}
-          / <code className="rounded bg-secondary px-1.5 py-0.5 text-primary">Customer123!</code>
-        </p>
-
-        {/* Stats */}
-        <div className="mx-auto mt-20 grid max-w-3xl grid-cols-2 gap-6 md:grid-cols-4">
-          {[
-            { value: '6', label: 'Banks connected' },
-            { value: '100%', label: 'Consent-driven' },
-            { value: '<50ms', label: 'Cached reads' },
-            { value: 'REST', label: 'OpenAPI v1' },
-          ].map((stat) => (
-            <div key={stat.label} className="rounded-xl border border-border bg-card/50 p-4">
-              <p className="text-2xl font-semibold text-primary">{stat.value}</p>
-              <p className="mt-1 text-xs text-muted-foreground">{stat.label}</p>
+        <div className="relative mx-auto grid max-w-6xl items-center gap-10 px-6 pb-20 pt-10 lg:grid-cols-2 lg:gap-16 lg:pb-28 lg:pt-16">
+          <div className="relative z-10">
+            <h1 className="font-display text-4xl font-bold leading-tight tracking-tight text-white sm:text-5xl lg:text-6xl">
+              Connect.{' '}
+              <span className="text-[hsl(42_92%_52%)]">Innovate.</span>{' '}
+              <span className="text-[hsl(42_92%_52%)]">Transform.</span>
+            </h1>
+            <p className="mt-5 max-w-lg text-base leading-relaxed text-white/70 sm:text-lg">
+              FinConnect is Namibia&apos;s open finance platform enabling secure data sharing between
+              banks, fintechs and businesses — with your consent.
+            </p>
+            <div className="mt-8 flex flex-wrap items-center gap-3">
+              <PurpleButton href="/register">
+                Get Started
+                <ArrowRight className="h-4 w-4" />
+              </PurpleButton>
+              <a
+                href="/docs"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex h-11 items-center rounded-lg border border-white/25 px-5 text-sm font-medium text-white transition hover:bg-white/10"
+              >
+                Explore Docs
+              </a>
             </div>
-          ))}
+          </div>
+
+          <div className="relative z-10 aspect-[4/3] w-full overflow-hidden rounded-2xl">
+            <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,hsl(260_70%_50%/0.25),transparent_70%)]" />
+            <Image
+              src="/landing/hero-ecosystem.png"
+              alt="FinConnect ecosystem connecting banks, fintechs, businesses, government and consumers"
+              fill
+              priority
+              className="object-contain"
+              sizes="(max-width: 1024px) 100vw, 50vw"
+            />
+          </div>
         </div>
       </section>
 
-      {/* Features */}
-      <section id="features" className="border-t border-border/60 bg-card/30 py-24">
-        <div className="container mx-auto max-w-6xl px-6">
-          <div className="mx-auto max-w-2xl text-center">
-            <h2 className="text-3xl font-semibold tracking-tight">Everything you need to build</h2>
-            <p className="mt-4 text-muted-foreground">
-              From account aggregation to developer tooling — BankBridge is the infrastructure layer
-              for open finance in Namibia.
-            </p>
-          </div>
-          <div className="mt-16 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-            {FEATURES.map((f) => (
-              <div
-                key={f.title}
-                className="group rounded-xl border border-border bg-card p-6 transition hover:border-primary/40 hover:bg-card/80"
+      {/* Powering the Future */}
+      <section id="platform" className="bg-[hsl(220_16%_96%)] py-20 md:py-28">
+        <div className="mx-auto max-w-6xl px-6">
+          <h2 className="text-center font-display text-3xl font-bold tracking-tight md:text-4xl">
+            Powering the Future of Finance
+          </h2>
+          <div className="mt-12 grid gap-5 sm:grid-cols-2 lg:grid-cols-5">
+            {AUDIENCE_CARDS.map(({ icon: Icon, title, description }) => (
+              <article
+                key={title}
+                className="rounded-xl border border-border bg-white p-6 shadow-sm transition hover:shadow-md"
               >
-                <div className="mb-4 flex h-10 w-10 items-center justify-center rounded-lg bg-primary/15 text-primary transition group-hover:bg-primary/25">
-                  <f.icon className="h-5 w-5" />
+                <div className="flex h-11 w-11 items-center justify-center rounded-lg bg-[#5A39E1]/10 text-[#5A39E1]">
+                  <Icon className="h-5 w-5" />
                 </div>
-                <h3 className="font-medium">{f.title}</h3>
-                <p className="mt-2 text-sm leading-relaxed text-muted-foreground">{f.description}</p>
-              </div>
+                <h3 className="mt-4 font-display text-lg font-semibold">{title}</h3>
+                <p className="mt-2 text-sm leading-relaxed text-muted-foreground">{description}</p>
+              </article>
             ))}
           </div>
         </div>
       </section>
 
-      {/* Banks */}
-      <section id="banks" className="py-24">
-        <div className="container mx-auto max-w-6xl px-6">
-          <div className="mx-auto max-w-2xl text-center">
-            <h2 className="text-3xl font-semibold tracking-tight">Supported banks</h2>
-            <p className="mt-4 text-muted-foreground">
-              Six major Namibian institutions — each with a dedicated adapter that normalizes data
-              into a single schema.
+      {/* Endless Possibilities */}
+      <section id="solutions" className="py-20 md:py-28">
+        <div className="mx-auto max-w-6xl px-6">
+          <div className="overflow-hidden rounded-3xl bg-[hsl(222_48%_10%)] px-6 py-14 md:px-12 md:py-16">
+            <h2 className="text-center font-display text-3xl font-bold tracking-tight text-white md:text-4xl">
+              Endless Possibilities
+            </h2>
+            <p className="mx-auto mt-4 max-w-2xl text-center text-white/65">
+              FinConnect enables a new generation of financial products and services.
             </p>
-          </div>
-          <div className="mt-12 grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-6">
-            {BANKS.map((bank) => (
-              <div
-                key={bank.slug}
-                className="flex flex-col items-center gap-3 rounded-xl border border-border bg-card/50 p-5 transition hover:border-primary/30"
-              >
-                {/* eslint-disable-next-line @next/next/no-img-element */}
-                <img
-                  src={`/banks/${bank.slug}.svg`}
-                  alt={bank.name}
-                  width={48}
-                  height={48}
-                  className="h-12 w-12 rounded-full"
-                />
-                <span className="text-center text-xs font-medium leading-tight">{bank.name}</span>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* How it works */}
-      <section className="border-t border-border/60 bg-card/30 py-24">
-        <div className="container mx-auto max-w-6xl px-6">
-          <div className="mx-auto max-w-2xl text-center">
-            <h2 className="text-3xl font-semibold tracking-tight">How it works</h2>
-            <p className="mt-4 text-muted-foreground">
-              Open banking made simple — for customers, developers, and regulated institutions.
-            </p>
-          </div>
-          <div className="mt-16 grid gap-8 md:grid-cols-3">
-            {STEPS.map((s) => (
-              <div key={s.step} className="relative">
-                <span className="text-5xl font-bold text-primary/20">{s.step}</span>
-                <h3 className="mt-2 text-lg font-medium">{s.title}</h3>
-                <p className="mt-2 text-sm leading-relaxed text-muted-foreground">{s.description}</p>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* Developers */}
-      <section id="developers" className="py-24">
-        <div className="container mx-auto max-w-6xl px-6">
-          <div className="overflow-hidden rounded-2xl border border-border bg-gradient-to-br from-primary/10 via-card to-card p-8 md:p-12">
-            <div className="grid items-center gap-8 md:grid-cols-2">
-              <div>
-                <h2 className="text-3xl font-semibold tracking-tight">Built for developers</h2>
-                <p className="mt-4 text-muted-foreground">
-                  Register your application, generate API keys, and start pulling normalized account
-                  and transaction data. Full Swagger documentation included.
-                </p>
-                <ul className="mt-6 space-y-2 text-sm text-muted-foreground">
-                  <li className="flex items-center gap-2">
-                    <ShieldCheck className="h-4 w-4 text-primary" />
-                    API key authentication with scoped permissions
-                  </li>
-                  <li className="flex items-center gap-2">
-                    <ShieldCheck className="h-4 w-4 text-primary" />
-                    Zod-validated request/response contracts
-                  </li>
-                  <li className="flex items-center gap-2">
-                    <ShieldCheck className="h-4 w-4 text-primary" />
-                    Sandbox with mock bank adapters
-                  </li>
-                </ul>
-                <div className="mt-8 flex flex-wrap gap-4">
-                  <Link href="/register" className={cn(buttonVariants())}>
-                    Create developer account
-                  </Link>
-                  <a
-                    href="/docs"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className={cn(buttonVariants({ variant: 'outline' }))}
-                  >
-                    Open API docs
-                  </a>
+            <div className="mt-12 grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-4">
+              {POSSIBILITIES.map(({ icon: Icon, label, color }) => (
+                <div
+                  key={label}
+                  className="flex flex-col items-center gap-3 rounded-xl border border-white/10 bg-white/5 p-5 text-center backdrop-blur-sm"
+                >
+                  <div className={cn('flex h-14 w-14 items-center justify-center rounded-xl', color)}>
+                    <Icon className="h-7 w-7" />
+                  </div>
+                  <span className="text-sm font-medium text-white/90">{label}</span>
                 </div>
-                <p className="mt-4 text-xs text-muted-foreground">
-                  Developer demo: <code className="text-primary">dev@bankbridge.na</code> /{' '}
-                  <code className="text-primary">Dev123!</code>
-                </p>
-              </div>
-              <div className="rounded-xl border border-border bg-background p-4 font-mono text-xs leading-relaxed text-muted-foreground">
-                <p className="text-primary">GET /api/v1/public/accounts</p>
-                <p className="mt-2">X-API-Key: bbk_live.xxxxxxxx</p>
-                <p className="mt-4 text-foreground">{`{`}</p>
-                <p className="pl-4">&quot;accounts&quot;: [</p>
-                <p className="pl-8">{`{`}</p>
-                <p className="pl-12">&quot;id&quot;: &quot;acc_…&quot;,</p>
-                <p className="pl-12">&quot;name&quot;: &quot;Cheque Account&quot;,</p>
-                <p className="pl-12">&quot;balance&quot;: 12450.00,</p>
-                <p className="pl-12">&quot;currency&quot;: &quot;NAD&quot;</p>
-                <p className="pl-8">{`}`}</p>
-                <p className="pl-4">]</p>
-                <p className="text-foreground">{`}`}</p>
+              ))}
+              <div className="flex flex-col items-center justify-center gap-3 rounded-xl border border-white/10 bg-white/5 p-5 text-center">
+                <span className="text-2xl tracking-widest text-white/50">•••</span>
+                <span className="text-sm font-medium text-white/70">And More…</span>
               </div>
             </div>
           </div>
         </div>
       </section>
 
-      {/* CTA */}
-      <section className="border-t border-border/60 py-24">
-        <div className="container mx-auto max-w-6xl px-6 text-center">
-          <h2 className="text-3xl font-semibold tracking-tight">Ready to get started?</h2>
-          <p className="mx-auto mt-4 max-w-xl text-muted-foreground">
-            Join the open banking ecosystem in Namibia. Connect banks, build apps, and give
-            customers control over their financial data.
+      {/* How FinConnect Works */}
+      <section className="bg-white py-20 md:py-28">
+        <div className="mx-auto max-w-6xl px-6">
+          <h2 className="text-center font-display text-3xl font-bold tracking-tight md:text-4xl">
+            How FinConnect Works
+          </h2>
+          <div className="mt-14 grid gap-8 sm:grid-cols-2 lg:grid-cols-5">
+            {HOW_IT_WORKS.map(({ icon: Icon, title, description }, index) => (
+              <div key={title} className="relative flex flex-col items-center text-center">
+                {index < HOW_IT_WORKS.length - 1 && (
+                  <div
+                    aria-hidden
+                    className="absolute left-[calc(50%+2rem)] top-7 hidden h-px w-[calc(100%-4rem)] border-t border-dashed border-[#5A39E1]/30 lg:block"
+                  />
+                )}
+                <div className="flex h-14 w-14 items-center justify-center rounded-full border-2 border-[#5A39E1]/30 bg-[#5A39E1]/10 text-[#5A39E1]">
+                  <Icon className="h-6 w-6" />
+                </div>
+                <h3 className="mt-4 font-display text-lg font-semibold">{title}</h3>
+                <p className="mt-2 text-sm leading-relaxed text-muted-foreground">{description}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* Supported Banks */}
+      <section id="banks" className="border-y border-border bg-[hsl(220_16%_97%)] py-20 md:py-24">
+        <div className="mx-auto max-w-6xl px-6">
+          <h2 className="text-center font-display text-3xl font-bold tracking-tight md:text-4xl">
+            Supported Namibian Banks
+          </h2>
+          <p className="mx-auto mt-4 max-w-2xl text-center text-muted-foreground">
+            Dedicated adapters for Namibia&apos;s major institutions — normalized into one schema.
           </p>
-          <div className="mt-8 flex flex-wrap items-center justify-center gap-4">
-            <Link href="/register" className={cn(buttonVariants({ size: 'lg' }))}>
-              Create free account
-            </Link>
-            <Link href="/login" className={cn(buttonVariants({ variant: 'outline', size: 'lg' }))}>
-              Sign in to dashboard
-            </Link>
+          <div className="mt-12 grid grid-cols-2 gap-x-6 gap-y-10 sm:grid-cols-3 lg:grid-cols-6">
+            {SUPPORTED_BANKS.map((bank) => (
+              <div key={bank.slug} className="flex flex-col items-center gap-3 text-center">
+                <div className="flex h-20 w-full items-center justify-center rounded-xl border border-border bg-white p-3 shadow-sm">
+                  <BankLogo slug={bank.slug} name={bank.name} size={64} className="max-h-14 w-auto" />
+                </div>
+                <span className="text-xs font-medium leading-tight text-foreground/80">{bank.name}</span>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* Built for Developers */}
+      <section id="developers" className="py-20 md:py-28">
+        <div className="mx-auto max-w-6xl px-6">
+          <div className="overflow-hidden rounded-3xl bg-[hsl(222_48%_10%)]">
+            <div className="grid items-center gap-10 p-8 md:p-12 lg:grid-cols-2 lg:gap-16">
+              <div>
+                <h2 className="font-display text-3xl font-bold tracking-tight text-white md:text-4xl">
+                  Built for Developers
+                </h2>
+                <p className="mt-4 text-lg text-white/65">One API. Endless possibilities.</p>
+                <ul className="mt-8 space-y-4">
+                  {DEV_FEATURES.map((feature) => (
+                    <li key={feature} className="flex items-center gap-3 text-white/85">
+                      <CheckCircle2 className="h-5 w-5 shrink-0 text-[#5A39E1]" />
+                      <span>{feature}</span>
+                    </li>
+                  ))}
+                </ul>
+                <div className="mt-8">
+                  <PurpleButton href="/register">Create Developer Account</PurpleButton>
+                </div>
+              </div>
+
+              <div className="overflow-hidden rounded-xl border border-white/10 bg-[hsl(222_48%_6%)] shadow-2xl">
+                <div className="flex items-center gap-2 border-b border-white/10 px-4 py-3">
+                  <span className="h-3 w-3 rounded-full bg-red-500/80" />
+                  <span className="h-3 w-3 rounded-full bg-yellow-500/80" />
+                  <span className="h-3 w-3 rounded-full bg-green-500/80" />
+                  <span className="ml-2 text-xs text-white/40">api.finconnect.na</span>
+                </div>
+                <pre className="overflow-x-auto p-5 font-mono text-xs leading-relaxed text-emerald-300/90">
+                  <code>{`GET /api/v1/public/accounts
+X-API-Key: fc_live.xxxxxxxx
+
+{
+  "accounts": [{
+    "id": "acc_001",
+    "name": "Checking Account",
+    "balance": "12500.50",
+    "currency": "NAD"
+  }]
+}`}</code>
+                </pre>
+                <div className="border-t border-white/10 p-4">
+                  <button
+                    type="button"
+                    className="w-full rounded-lg bg-[#5A39E1] py-2.5 text-sm font-semibold text-white"
+                  >
+                    Send Request
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Security & Trust */}
+      <section className="bg-[hsl(220_16%_96%)] py-20 md:py-28">
+        <div className="mx-auto max-w-6xl px-6">
+          <h2 className="text-center font-display text-3xl font-bold tracking-tight md:text-4xl">
+            Security &amp; Trust at the Core
+          </h2>
+          <div className="relative mt-14 grid items-center gap-8 lg:grid-cols-[1fr_auto_1fr]">
+            <div className="space-y-8">
+              {SECURITY_FEATURES.filter((f) => f.side === 'left').map(({ icon: Icon, title }) => (
+                <div key={title} className="flex items-start gap-4 lg:flex-row-reverse lg:text-right">
+                  <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-lg border border-[#5A39E1]/30 bg-[#5A39E1]/10 text-[#5A39E1]">
+                    <Icon className="h-5 w-5" />
+                  </div>
+                  <div>
+                    <h3 className="font-semibold">{title}</h3>
+                    <p className="mt-1 text-sm text-muted-foreground">
+                      Built into every connection and data exchange.
+                    </p>
+                  </div>
+                </div>
+              ))}
+            </div>
+
+            <div className="relative mx-auto aspect-square w-56 sm:w-72 lg:w-80">
+              <Image
+                src="/landing/security-shield.png"
+                alt="Security shield protecting financial data"
+                fill
+                className="object-contain"
+                sizes="320px"
+              />
+            </div>
+
+            <div className="space-y-8">
+              {SECURITY_FEATURES.filter((f) => f.side === 'right').map(({ icon: Icon, title }) => (
+                <div key={title} className="flex items-start gap-4">
+                  <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-lg border border-[#5A39E1]/30 bg-[#5A39E1]/10 text-[#5A39E1]">
+                    <Icon className="h-5 w-5" />
+                  </div>
+                  <div>
+                    <h3 className="font-semibold">{title}</h3>
+                    <p className="mt-1 text-sm text-muted-foreground">
+                      Built into every connection and data exchange.
+                    </p>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Final CTA */}
+      <section id="about" className="py-20 md:py-28">
+        <div className="mx-auto max-w-6xl px-6">
+          <div className="grid items-center gap-12 lg:grid-cols-2 lg:gap-16">
+            <div>
+              <h2 className="font-display text-3xl font-bold tracking-tight md:text-4xl">
+                One Connection. All Your Finances.
+              </h2>
+              <p className="mt-4 text-lg text-muted-foreground">
+                Aggregate your accounts, track spending, set goals and get AI-powered insights — all
+                in one place.
+              </p>
+              <div className="mt-8">
+                <Link
+                  href="/register"
+                  className="inline-flex h-11 items-center rounded-lg bg-[#5A39E1] px-6 text-sm font-semibold text-white transition hover:bg-[#4A2FD0]"
+                >
+                  Learn More
+                </Link>
+              </div>
+              <p className="mt-6 text-sm text-muted-foreground">
+                Demo:{' '}
+                <code className="font-medium text-foreground">customer@finconnect.na</code> /{' '}
+                <code className="font-medium text-foreground">Customer123!</code>
+              </p>
+            </div>
+
+            <div className="relative aspect-[16/10] w-full overflow-hidden rounded-2xl border border-border bg-[hsl(220_16%_97%)] shadow-lg">
+              <Image
+                src="/landing/dashboard-mockup.png"
+                alt="FinConnect mobile and web dashboard showing spending overview and transactions"
+                fill
+                className="object-cover"
+                sizes="(max-width: 1024px) 100vw, 50vw"
+              />
+            </div>
           </div>
         </div>
       </section>
 
       {/* Footer */}
-      <footer className="border-t border-border py-10">
-        <div className="container mx-auto flex max-w-6xl flex-col items-center justify-between gap-4 px-6 text-sm text-muted-foreground md:flex-row">
+      <footer className="border-t border-border bg-white py-10">
+        <div className="mx-auto flex max-w-6xl flex-col items-center justify-between gap-4 px-6 text-sm text-muted-foreground md:flex-row">
           <div className="flex items-center gap-2">
-            <span className="flex h-6 w-6 items-center justify-center rounded bg-primary text-xs font-bold text-primary-foreground">
-              BB
+            <span className="flex h-7 w-7 items-center justify-center rounded bg-[hsl(42_92%_48%)] text-xs font-bold text-[hsl(222_48%_12%)]">
+              FC
             </span>
-            <span>BankBridge © {new Date().getFullYear()}</span>
+            <span className="font-display text-foreground">FinConnect</span>
+            <span>© {new Date().getFullYear()}</span>
           </div>
           <div className="flex gap-6">
             <Link href="/login" className="hover:text-foreground">

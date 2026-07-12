@@ -32,7 +32,7 @@ export class RegisterUseCase {
       passwordHash,
       firstName: input.firstName.trim(),
       lastName: input.lastName.trim(),
-      role: UserRole.CUSTOMER, // self-service registration is always a customer
+      role: input.accountType ?? UserRole.CUSTOMER,
     });
 
     const tokens = await this.tokenIssuer.issueFor(user);

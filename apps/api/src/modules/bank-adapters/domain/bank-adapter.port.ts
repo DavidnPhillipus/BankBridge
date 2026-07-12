@@ -1,7 +1,7 @@
 /**
  * BankAdapterPort — the single contract every bank integration must satisfy.
  *
- * This is the architectural heart of BankBridge. Today the implementations are
+ * This is the architectural heart of FinConnect. Today the implementations are
  * mock adapters that return intentionally different JSON shapes; tomorrow they
  * become real HTTP/OAuth2 clients. Consumers (the API Gateway) only ever depend
  * on this interface, so swapping mock -> real is a provider change, nothing more.

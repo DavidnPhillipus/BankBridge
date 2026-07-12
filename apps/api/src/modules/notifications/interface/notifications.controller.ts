@@ -12,6 +12,7 @@ import {
 import { ApiBearerAuth, ApiOperation, ApiTags } from '@nestjs/swagger';
 import type { NotificationPage, UnreadCount } from '@bankbridge/contracts';
 import { CurrentUser } from '../../auth/interface/decorators/current-user.decorator';
+import { Roles } from '../../auth/interface/decorators/roles.decorator';
 import { GetUnreadCountUseCase } from '../application/get-unread-count.use-case';
 import { ListNotificationsUseCase } from '../application/list-notifications.use-case';
 import { MarkAllNotificationsReadUseCase } from '../application/mark-all-notifications-read.use-case';
@@ -20,6 +21,7 @@ import { NotificationQueryDto } from './dto/notification-query.dto';
 
 @ApiTags('Notifications')
 @ApiBearerAuth()
+@Roles('CUSTOMER')
 @Controller({ path: 'notifications', version: '1' })
 export class NotificationsController {
   constructor(

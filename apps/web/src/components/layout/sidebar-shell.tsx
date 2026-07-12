@@ -2,50 +2,41 @@
 
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
-import {
-  Bell,
-  Building2,
-  Code2,
-  LayoutDashboard,
-  Lightbulb,
-  LogOut,
-  Shield,
-  Wallet,
-  ArrowLeftRight,
-} from 'lucide-react';
+import type { LucideIcon } from 'lucide-react';
+import { LogOut } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useAuthStore } from '@/lib/auth-store';
 import { authApi } from '@/lib/api';
+import { roleLabel } from '@/lib/routing';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { useQuery } from '@tanstack/react-query';
-import { notificationsApi } from '@/lib/api';
 
-const navItems = [
-  { href: '/dashboard', label: 'Overview', icon: LayoutDashboard },
-  { href: '/accounts', label: 'Accounts', icon: Wallet },
-  { href: '/transactions', label: 'Transactions', icon: ArrowLeftRight },
-  { href: '/consents', label: 'Consents', icon: Shield },
-  { href: '/insights', label: 'AI Insights', icon: Lightbulb },
-  { href: '/notifications', label: 'Notifications', icon: Bell },
-];
+export interface NavItem {
+  href: string;
+  label: string;
+  icon: LucideIcon;
+  badge?: number;
+}
 
-const devNav = { href: '/developer', label: 'Developer Portal', icon: Code2 };
+interface SidebarShellProps {
+  title: string;
+  subtitle: string;
+  icon: LucideIcon;
+  navItems: NavItem[];
+  children: React.ReactNode;
+}
 
-export function DashboardShell({ children }: { children: React.ReactNode }): React.ReactElement {
+export function SidebarShell({
+  title,
+  subtitle,
+  icon: BrandIcon,
+  navItems,
+  children,
+}: SidebarShellProps): React.ReactElement {
   const pathname = usePathname();
   const router = useRouter();
   const user = useAuthStore((s) => s.user);
   const clearAuth = useAuthStore((s) => s.clearAuth);
-
-  const { data: unread } = useQuery({
-    queryKey: ['notifications', 'unread'],
-    queryFn: () => notificationsApi.unreadCount(),
-    refetchInterval: 60_000,
-  });
-
-  const isDeveloper = user?.role === 'DEVELOPER' || user?.role === 'ADMIN';
-  const items = isDeveloper ? [...navItems, devNav] : navItems;
 
   async function logout(): Promise<void> {
     try {
@@ -60,12 +51,15 @@ export function DashboardShell({ children }: { children: React.ReactNode }): Rea
   return (
     <div className="flex min-h-screen bg-background">
       <aside className="hidden w-64 shrink-0 border-r border-border bg-card/40 lg:flex lg:flex-col">
-        <div className="flex h-16 items-center gap-2 border-b border-border px-6">
-          <Building2 className="h-6 w-6 text-primary" />
-          <span className="text-lg font-semibold">BankBridge</span>
+        <div className="flex h-16 flex-col justify-center border-b border-border px-6">
+          <div className="flex items-center gap-2">
+            <BrandIcon className="h-6 w-6 text-primary" />
+            <span className="text-lg font-semibold">{title}</span>
+          </div>
+          <p className="text-xs text-muted-foreground">{subtitle}</p>
         </div>
         <nav className="flex-1 space-y-1 p-4">
-          {items.map(({ href, label, icon: Icon }) => {
+          {navItems.map(({ href, label, icon: Icon, badge }) => {
             const active = pathname === href || pathname.startsWith(`${href}/`);
             return (
               <Link
@@ -80,9 +74,9 @@ export function DashboardShell({ children }: { children: React.ReactNode }): Rea
               >
                 <Icon className="h-4 w-4" />
                 {label}
-                {href === '/notifications' && unread && unread.count > 0 ? (
+                {badge && badge > 0 ? (
                   <Badge variant="default" className="ml-auto">
-                    {unread.count}
+                    {badge}
                   </Badge>
                 ) : null}
               </Link>
@@ -95,6 +89,11 @@ export function DashboardShell({ children }: { children: React.ReactNode }): Rea
               {user?.firstName} {user?.lastName}
             </p>
             <p className="text-xs text-muted-foreground">{user?.email}</p>
+            {user ? (
+              <Badge variant="secondary" className="mt-2">
+                {roleLabel(user.role)}
+              </Badge>
+            ) : null}
           </div>
           <Button variant="ghost" className="w-full justify-start gap-2" onClick={() => void logout()}>
             <LogOut className="h-4 w-4" />
@@ -105,7 +104,7 @@ export function DashboardShell({ children }: { children: React.ReactNode }): Rea
 
       <div className="flex flex-1 flex-col">
         <header className="flex h-16 items-center justify-between border-b border-border px-6 lg:hidden">
-          <span className="font-semibold">BankBridge</span>
+          <span className="font-semibold">{title}</span>
           <Button variant="ghost" size="sm" onClick={() => void logout()}>
             Sign out
           </Button>

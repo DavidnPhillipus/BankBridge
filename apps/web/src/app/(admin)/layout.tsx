@@ -2,17 +2,17 @@
 
 import { AuthGuard } from '@/components/layout/auth-guard';
 import { RoleGuard } from '@/components/layout/role-guard';
-import { CustomerShell } from '@/components/layout/customer-shell';
+import { AdminShell } from '@/components/layout/admin-shell';
 
-export default function CustomerLayout({
+export default function AdminLayout({
   children,
 }: {
   children: React.ReactNode;
 }): React.ReactElement {
   return (
     <AuthGuard>
-      <RoleGuard allowed={['CUSTOMER']}>
-        <CustomerShell>{children}</CustomerShell>
+      <RoleGuard allowed={['ADMIN']}>
+        <AdminShell>{children}</AdminShell>
       </RoleGuard>
     </AuthGuard>
   );

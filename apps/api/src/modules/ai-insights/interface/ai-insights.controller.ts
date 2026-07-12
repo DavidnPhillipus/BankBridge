@@ -2,11 +2,13 @@ import { Controller, Get, Query } from '@nestjs/common';
 import { ApiBearerAuth, ApiOperation, ApiTags } from '@nestjs/swagger';
 import type { AiInsightsResponse } from '@bankbridge/contracts';
 import { CurrentUser } from '../../auth/interface/decorators/current-user.decorator';
+import { Roles } from '../../auth/interface/decorators/roles.decorator';
 import { GenerateInsightsUseCase } from '../application/generate-insights.use-case';
 import { InsightsQueryDto } from './dto/insights-query.dto';
 
 @ApiTags('AI Insights')
 @ApiBearerAuth()
+@Roles('CUSTOMER')
 @Controller({ path: 'ai-insights', version: '1' })
 export class AiInsightsController {
   constructor(private readonly generateInsights: GenerateInsightsUseCase) {}

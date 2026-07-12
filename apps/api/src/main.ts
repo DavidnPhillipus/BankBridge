@@ -26,7 +26,7 @@ async function bootstrap(): Promise<void> {
   patchNestJsSwagger();
 
   const swaggerConfig = new DocumentBuilder()
-    .setTitle('BankBridge API')
+    .setTitle('FinConnect API')
     .setDescription('Open Banking Platform for Namibia - standardized banking API')
     .setVersion('1.0')
     .addBearerAuth()
@@ -38,7 +38,7 @@ async function bootstrap(): Promise<void> {
   const port = process.env.API_PORT ?? 4000;
   await app.listen(port);
   // eslint-disable-next-line no-console
-  console.log(`BankBridge API running on http://localhost:${port} (docs: /docs)`);
+  console.log(`FinConnect API running on http://localhost:${port} (docs: /docs)`);
 }
 
 void bootstrap();

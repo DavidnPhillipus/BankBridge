@@ -2,7 +2,7 @@
   "name": "bankbridge",
   "version": "0.1.0",
   "private": true,
-  "description": "BankBridge - Open Banking Platform for Namibia",
+  "description": "FinConnect - Open Banking Platform for Namibia",
   "workspaces": [
     "apps/*",
     "packages/*"

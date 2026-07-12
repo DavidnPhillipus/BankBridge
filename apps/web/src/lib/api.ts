@@ -3,6 +3,7 @@ import type {
   AiInsightsResponse,
   AnalyticsOverview,
   Application,
+  AuditLog,
   AuthResponse,
   Bank,
   Consent,
@@ -11,6 +12,7 @@ import type {
   CreateConsentInput,
   LoginInput,
   NotificationPage,
+  PaginationMeta,
   RegisterInput,
   TransactionPage,
   UnreadCount,
@@ -83,4 +85,14 @@ export const developerApi = {
   createApiKey: (input: import('@bankbridge/contracts').CreateApiKeyInput) =>
     apiClient.post<CreatedApiKey>('/api-keys', input),
   revokeApiKey: (id: string) => apiClient.delete(`/api-keys/${id}`),
+};
+
+export interface AuditLogPage {
+  data: AuditLog[];
+  meta: PaginationMeta;
+}
+
+export const adminApi = {
+  auditLogs: (page = 1, pageSize = 20) =>
+    apiClient.get<AuditLogPage>(`/audit-logs/admin?page=${page}&pageSize=${pageSize}`),
 };

@@ -3,7 +3,7 @@ import tseslint from 'typescript-eslint';
 import prettier from 'eslint-config-prettier';
 
 /**
- * Base ESLint flat config shared by every BankBridge workspace.
+ * Base ESLint flat config shared by every FinConnect workspace.
  * Strong typing + clean-code rules; Prettier disables stylistic conflicts.
  */
 export default tseslint.config(

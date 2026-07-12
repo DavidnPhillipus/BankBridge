@@ -1,19 +1,16 @@
 'use client';
 
 import { useState } from 'react';
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { developerApi } from '@/lib/api';
-import { useAuthStore } from '@/lib/auth-store';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Badge } from '@/components/ui/badge';
 
-export default function DeveloperPage(): React.ReactElement {
-  const user = useAuthStore((s) => s.user);
+export default function DeveloperApiKeysPage(): React.ReactElement {
   const qc = useQueryClient();
-  const [appName, setAppName] = useState('');
   const [selectedApp, setSelectedApp] = useState('');
   const [keyName, setKeyName] = useState('');
   const [newSecret, setNewSecret] = useState<string | null>(null);
@@ -21,7 +18,6 @@ export default function DeveloperPage(): React.ReactElement {
   const { data: apps } = useQuery({
     queryKey: ['developer', 'apps'],
     queryFn: () => developerApi.applications(),
-    enabled: user?.role === 'DEVELOPER' || user?.role === 'ADMIN',
   });
 
   const appId = selectedApp || apps?.[0]?.id || '';
@@ -32,25 +28,12 @@ export default function DeveloperPage(): React.ReactElement {
     enabled: !!appId,
   });
 
-  const createApp = useMutation({
-    mutationFn: () =>
-      developerApi.createApplication({
-        name: appName,
-        environment: 'SANDBOX',
-        redirectUris: [],
-      }),
-    onSuccess: () => {
-      setAppName('');
-      void qc.invalidateQueries({ queryKey: ['developer', 'apps'] });
-    },
-  });
-
   const createKey = useMutation({
     mutationFn: () =>
       developerApi.createApiKey({
         applicationId: appId,
         name: keyName,
-        scopes: ['ACCOUNTS_READ', 'TRANSACTIONS_READ'],
+        scopes: ['ACCOUNTS_READ', 'BALANCES_READ', 'TRANSACTIONS_READ'],
       }),
     onSuccess: (data) => {
       setKeyName('');
@@ -64,55 +47,43 @@ export default function DeveloperPage(): React.ReactElement {
     onSuccess: () => void qc.invalidateQueries({ queryKey: ['developer', 'keys', appId] }),
   });
 
-  if (user?.role !== 'DEVELOPER' && user?.role !== 'ADMIN') {
-    return <p className="text-muted-foreground">Developer portal requires a DEVELOPER or ADMIN account.</p>;
-  }
-
   return (
     <div className="space-y-8">
       <div>
-        <h1 className="text-2xl font-semibold">Developer Portal</h1>
-        <p className="text-muted-foreground">Register apps and manage API keys</p>
+        <h1 className="text-2xl font-semibold">API keys</h1>
+        <p className="text-muted-foreground">
+          Keys authenticate your server when calling{' '}
+          <code className="text-primary">/api/v1/public/*</code> endpoints.
+        </p>
       </div>
 
-      <Card>
-        <CardHeader>
-          <CardTitle className="text-base">Create application</CardTitle>
-        </CardHeader>
-        <CardContent className="flex flex-wrap gap-3">
-          <Input
-            placeholder="App name"
-            value={appName}
-            onChange={(e) => setAppName(e.target.value)}
-            className="max-w-xs"
-          />
-          <Button onClick={() => createApp.mutate()} disabled={!appName || createApp.isPending}>
-            Create
-          </Button>
-        </CardContent>
-      </Card>
-
-      <div className="space-y-3">
-        <Label>Your applications</Label>
-        <div className="flex flex-wrap gap-2">
-          {apps?.map((a) => (
-            <button
-              key={a.id}
-              type="button"
-              onClick={() => setSelectedApp(a.id)}
-              className={`rounded-lg border px-4 py-2 text-sm ${
-                appId === a.id ? 'border-primary bg-primary/10' : 'border-border'
-              }`}
-            >
-              {a.name}
-            </button>
-          ))}
+      {apps && apps.length > 0 ? (
+        <div className="space-y-2">
+          <Label>Application</Label>
+          <div className="flex flex-wrap gap-2">
+            {apps.map((a) => (
+              <button
+                key={a.id}
+                type="button"
+                onClick={() => setSelectedApp(a.id)}
+                className={`rounded-lg border px-4 py-2 text-sm ${
+                  appId === a.id ? 'border-primary bg-primary/10' : 'border-border'
+                }`}
+              >
+                {a.name}
+              </button>
+            ))}
+          </div>
         </div>
-      </div>
+      ) : (
+        <p className="text-sm text-muted-foreground">
+          Create an application first before issuing API keys.
+        </p>
+      )}
 
       <Card>
         <CardHeader>
-          <CardTitle className="text-base">Issue API key</CardTitle>
+          <CardTitle className="text-base">Issue new key</CardTitle>
         </CardHeader>
         <CardContent className="space-y-3">
           <Input
@@ -126,7 +97,9 @@ export default function DeveloperPage(): React.ReactElement {
           </Button>
           {newSecret ? (
             <div className="rounded-lg border border-amber-500/40 bg-amber-500/10 p-4">
-              <p className="text-sm font-medium text-amber-400">Copy now — shown once only</p>
+              <p className="text-sm font-medium text-amber-700 dark:text-amber-400">
+                Copy now — shown once only
+              </p>
               <code className="mt-2 block break-all text-xs">{newSecret}</code>
             </div>
           ) : null}

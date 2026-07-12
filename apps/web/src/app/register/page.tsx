@@ -3,13 +3,15 @@
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useState } from 'react';
-import { registerSchema } from '@bankbridge/contracts';
+import { UserRole, registerSchema, type RegisterAccountType } from '@bankbridge/contracts';
 import { authApi } from '@/lib/api';
 import { useAuthStore } from '@/lib/auth-store';
+import { homePathForRole } from '@/lib/routing';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
+import { cn } from '@/lib/utils';
 
 export default function RegisterPage(): React.ReactElement {
   const router = useRouter();
@@ -19,6 +21,7 @@ export default function RegisterPage(): React.ReactElement {
     password: '',
     firstName: '',
     lastName: '',
+    accountType: UserRole.CUSTOMER as RegisterAccountType,
   });
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
@@ -35,7 +38,7 @@ export default function RegisterPage(): React.ReactElement {
     try {
       const res = await authApi.register(parsed.data);
       setAuth(res);
-      router.push('/dashboard');
+      router.push(homePathForRole(res.user.role));
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Registration failed');
     } finally {
@@ -53,10 +56,36 @@ export default function RegisterPage(): React.ReactElement {
             </Link>
           </div>
           <CardTitle>Create account</CardTitle>
-          <CardDescription>Join BankBridge as a customer</CardDescription>
+          <CardDescription>Choose whether you&apos;re joining as a customer or a developer</CardDescription>
         </CardHeader>
         <CardContent>
           <form onSubmit={(e) => void onSubmit(e)} className="space-y-4">
+            <div className="space-y-2">
+              <Label>Account type</Label>
+              <div className="grid grid-cols-2 gap-2">
+                {(
+                  [
+                    { value: UserRole.CUSTOMER, label: 'Customer', hint: 'Link banks & view finances' },
+                    { value: UserRole.DEVELOPER, label: 'Developer', hint: 'Build apps on the API' },
+                  ] as const
+                ).map((option) => (
+                  <button
+                    key={option.value}
+                    type="button"
+                    onClick={() => setForm({ ...form, accountType: option.value })}
+                    className={cn(
+                      'rounded-lg border p-3 text-left text-sm transition',
+                      form.accountType === option.value
+                        ? 'border-primary bg-primary/10'
+                        : 'border-border hover:border-primary/40',
+                    )}
+                  >
+                    <p className="font-medium">{option.label}</p>
+                    <p className="mt-1 text-xs text-muted-foreground">{option.hint}</p>
+                  </button>
+                ))}
+              </div>
+            </div>
             <div className="grid grid-cols-2 gap-3">
               <div className="space-y-2">
                 <Label htmlFor="firstName">First name</Label>

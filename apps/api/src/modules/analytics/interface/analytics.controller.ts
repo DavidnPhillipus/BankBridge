@@ -2,12 +2,14 @@ import { Controller, Get, HttpCode, HttpStatus, Post, Query } from '@nestjs/comm
 import { ApiBearerAuth, ApiOperation, ApiTags } from '@nestjs/swagger';
 import type { AnalyticsOverview, AnalyticsSnapshot } from '@bankbridge/contracts';
 import { CurrentUser } from '../../auth/interface/decorators/current-user.decorator';
+import { Roles } from '../../auth/interface/decorators/roles.decorator';
 import { GetOverviewUseCase } from '../application/get-overview.use-case';
 import { RecomputeSnapshotsUseCase } from '../application/recompute-snapshots.use-case';
 import { AnalyticsQueryDto } from './dto/analytics-query.dto';
 
 @ApiTags('Analytics')
 @ApiBearerAuth()
+@Roles('CUSTOMER')
 @Controller({ path: 'analytics', version: '1' })
 export class AnalyticsController {
   constructor(

@@ -17,42 +17,42 @@ const BANKS = [
     name: 'Bank Windhoek',
     slug: 'bank-windhoek',
     primaryColor: '#0033A0',
-    logoUrl: '/banks/bank-windhoek.svg',
+    logoUrl: '/banks/bank-windhoek.png',
   },
   {
     adapterKey: 'bank_of_namibia',
     name: 'Bank of Namibia',
     slug: 'bank-of-namibia',
     primaryColor: '#1D4E89',
-    logoUrl: '/banks/bank-of-namibia.svg',
+    logoUrl: '/banks/bank-of-namibia.png',
   },
   {
     adapterKey: 'fnb_namibia',
     name: 'FNB Namibia',
     slug: 'fnb-namibia',
     primaryColor: '#008752',
-    logoUrl: '/banks/fnb-namibia.svg',
+    logoUrl: '/banks/fnb-namibia.png',
   },
   {
     adapterKey: 'nampost',
     name: 'NamPost',
     slug: 'nampost',
     primaryColor: '#E4002B',
-    logoUrl: '/banks/nampost.svg',
+    logoUrl: '/banks/nampost.jpg',
   },
   {
     adapterKey: 'standard_bank_namibia',
     name: 'Standard Bank Namibia',
     slug: 'standard-bank-namibia',
     primaryColor: '#0033A1',
-    logoUrl: '/banks/standard-bank-namibia.svg',
+    logoUrl: '/banks/standard-bank-namibia.png',
   },
   {
     adapterKey: 'nedbank_namibia',
     name: 'Nedbank Namibia',
     slug: 'nedbank-namibia',
     primaryColor: '#006A4D',
-    logoUrl: '/banks/nedbank-namibia.svg',
+    logoUrl: '/banks/nedbank-namibia.png',
   },
 ] as const;
 
@@ -128,18 +128,18 @@ async function seedCategories(): Promise<void> {
 async function seedApplication(ownerId: string): Promise<string> {
   await prisma.application.upsert({
     where: { id: DEMO_APP_ID },
-    update: { name: 'BankBridge Dashboard', ownerId },
+    update: { name: 'FinConnect Dashboard', ownerId },
     create: {
       id: DEMO_APP_ID,
       ownerId,
-      name: 'BankBridge Dashboard',
+      name: 'FinConnect Dashboard',
       description: 'First-party dashboard application',
       environment: 'SANDBOX',
       redirectUris: [],
     },
   });
   // eslint-disable-next-line no-console
-  console.log('Seeded demo application: BankBridge Dashboard');
+  console.log('Seeded demo application: FinConnect Dashboard');
   return DEMO_APP_ID;
 }
 
@@ -165,23 +165,43 @@ async function seedConsents(userId: string, applicationId: string): Promise<void
   console.log(`Seeded ${banks.length} consents for demo customer`);
 }
 
+async function migrateDemoEmails(): Promise<void> {
+  const renames = [
+    ['admin@bankbridge.na', 'admin@finconnect.na'],
+    ['dev@bankbridge.na', 'dev@finconnect.na'],
+    ['customer@bankbridge.na', 'customer@finconnect.na'],
+  ] as const;
+  for (const [from, to] of renames) {
+    const existing = await prisma.user.findUnique({ where: { email: from } });
+    if (!existing) continue;
+    const taken = await prisma.user.findUnique({ where: { email: to } });
+    if (taken) {
+      await prisma.user.delete({ where: { email: from } });
+    } else {
+      await prisma.user.update({ where: { email: from }, data: { email: to } });
+    }
+  }
+}
+
 async function main(): Promise<void> {
+  await migrateDemoEmails();
+
   await upsertUser({
-    email: 'admin@bankbridge.na',
+    email: 'admin@finconnect.na',
     password: 'Admin123!',
     firstName: 'Platform',
     lastName: 'Admin',
     role: Role.ADMIN,
   });
   await upsertUser({
-    email: 'dev@bankbridge.na',
+    email: 'dev@finconnect.na',
     password: 'Dev123!',
     firstName: 'Demo',
     lastName: 'Developer',
     role: Role.DEVELOPER,
   });
   await upsertUser({
-    email: 'customer@bankbridge.na',
+    email: 'customer@finconnect.na',
     password: 'Customer123!',
     firstName: 'Demo',
     lastName: 'Customer',
@@ -192,8 +212,8 @@ async function main(): Promise<void> {
   await seedCategories();
 
   const [dev, customer] = await Promise.all([
-    prisma.user.findUnique({ where: { email: 'dev@bankbridge.na' } }),
-    prisma.user.findUnique({ where: { email: 'customer@bankbridge.na' } }),
+    prisma.user.findUnique({ where: { email: 'dev@finconnect.na' } }),
+    prisma.user.findUnique({ where: { email: 'customer@finconnect.na' } }),
   ]);
   if (dev && customer) {
     const appId = await seedApplication(dev.id);

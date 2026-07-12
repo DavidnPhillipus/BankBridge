@@ -3,7 +3,6 @@
 import { useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { useAuthStore } from '@/lib/auth-store';
-import { DashboardShell } from '@/components/layout/dashboard-shell';
 
 export function AuthGuard({ children }: { children: React.ReactNode }): React.ReactElement | null {
   const router = useRouter();
@@ -18,5 +17,5 @@ export function AuthGuard({ children }: { children: React.ReactNode }): React.Re
 
   if (!accessToken || !user) return null;
 
-  return <DashboardShell>{children}</DashboardShell>;
+  return <>{children}</>;
 }

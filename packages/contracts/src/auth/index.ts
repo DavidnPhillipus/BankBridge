@@ -1,5 +1,9 @@
 import { z } from 'zod';
-import { userRoleSchema } from '../common/roles';
+import { userRoleSchema, UserRole } from '../common/roles';
+
+/** Self-service registration account types (ADMIN is never self-service). */
+export const registerAccountTypeSchema = z.enum([UserRole.CUSTOMER, UserRole.DEVELOPER]);
+export type RegisterAccountType = z.infer<typeof registerAccountTypeSchema>;
 
 /** Registration payload. Password policy enforced here so API + Web agree. */
 export const registerSchema = z.object({
@@ -10,6 +14,7 @@ export const registerSchema = z.object({
     .max(72, 'Password must be at most 72 characters'), // bcrypt input limit
   firstName: z.string().min(1).max(80),
   lastName: z.string().min(1).max(80),
+  accountType: registerAccountTypeSchema.default(UserRole.CUSTOMER),
 });
 export type RegisterInput = z.infer<typeof registerSchema>;
 

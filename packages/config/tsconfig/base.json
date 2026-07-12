@@ -1,6 +1,6 @@
 {
   "$schema": "https://json.schemastore.org/tsconfig",
-  "display": "BankBridge Base",
+    "display": "FinConnect Base",
   "compilerOptions": {
     "strict": true,
     "esModuleInterop": true,

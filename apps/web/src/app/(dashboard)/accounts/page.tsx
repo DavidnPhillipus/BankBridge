@@ -1,9 +1,9 @@
 'use client';
 
-import Image from 'next/image';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { RefreshCw } from 'lucide-react';
 import { accountsApi } from '@/lib/api';
+import { BankLogo } from '@/components/banks/bank-logo';
 import { formatMoney } from '@/lib/format';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
@@ -71,33 +71,5 @@ export default function AccountsPage(): React.ReactElement {
         </div>
       )}
     </div>
-  );
-}
-
-function BankLogo({ name }: { name: string }): React.ReactElement {
-  const slugByName: Record<string, string> = {
-    'Bank Windhoek': 'bank-windhoek',
-    'Bank of Namibia': 'bank-of-namibia',
-    'FNB Namibia': 'fnb-namibia',
-    NamPost: 'nampost',
-    'Standard Bank Namibia': 'standard-bank-namibia',
-    'Nedbank Namibia': 'nedbank-namibia',
-  };
-  const slug = slugByName[name];
-  if (!slug) {
-    return (
-      <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-secondary text-xs font-medium">
-        {name[0]}
-      </div>
-    );
-  }
-  return (
-    <Image
-      src={`/banks/${slug}.png`}
-      alt={name}
-      width={40}
-      height={40}
-      className="rounded-lg object-contain bg-white/5 p-1"
-    />
   );
 }

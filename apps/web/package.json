@@ -2,7 +2,7 @@
   "name": "@bankbridge/web",
   "version": "0.1.0",
   "private": true,
-  "description": "BankBridge Web - Next.js 15 SaaS dashboard",
+  "description": "FinConnect Web - Next.js 15 SaaS dashboard",
   "scripts": {
     "dev": "next dev -p 3000",
     "build": "next build",

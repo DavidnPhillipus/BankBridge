@@ -13,6 +13,7 @@ import {
 import { ApiBearerAuth, ApiOperation, ApiTags } from '@nestjs/swagger';
 import type { Consent } from '@bankbridge/contracts';
 import { CurrentUser } from '../../auth/interface/decorators/current-user.decorator';
+import { Roles } from '../../auth/interface/decorators/roles.decorator';
 import { GrantConsentUseCase } from '../application/grant-consent.use-case';
 import { ListConsentsUseCase } from '../application/list-consents.use-case';
 import { RevokeConsentUseCase } from '../application/revoke-consent.use-case';
@@ -20,6 +21,7 @@ import { CreateConsentDto, ListConsentsQueryDto } from './dto/consent.dto';
 
 @ApiTags('Consent')
 @ApiBearerAuth()
+@Roles('CUSTOMER')
 @Controller({ path: 'consents', version: '1' })
 export class ConsentController {
   constructor(

@@ -24,6 +24,6 @@ export const useAuthStore = create<AuthState>()(
         }),
       clearAuth: () => set({ user: null, accessToken: null, refreshToken: null }),
     }),
-    { name: 'bankbridge-auth' },
+    { name: 'finconnect-auth' },
   ),
 );

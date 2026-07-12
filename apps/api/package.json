@@ -2,7 +2,7 @@
   "name": "@bankbridge/api",
   "version": "0.1.0",
   "private": true,
-  "description": "BankBridge API - NestJS Open Banking backend",
+  "description": "FinConnect API - NestJS Open Banking backend",
   "scripts": {
     "build": "npm run build --workspace @bankbridge/contracts && nest build && node scripts/fix-dist-entry.mjs",
     "start": "nest start",

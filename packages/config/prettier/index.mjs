@@ -1,5 +1,5 @@
 /**
- * Shared Prettier config for all BankBridge workspaces.
+ * Shared Prettier config for all FinConnect workspaces.
  * @type {import('prettier').Config}
  */
 export default {

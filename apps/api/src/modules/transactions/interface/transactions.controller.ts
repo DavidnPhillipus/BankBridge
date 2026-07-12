@@ -11,11 +11,13 @@ import {
 import { ApiBearerAuth, ApiOperation, ApiTags } from '@nestjs/swagger';
 import type { TransactionPage } from '@bankbridge/contracts';
 import { CurrentUser } from '../../auth/interface/decorators/current-user.decorator';
+import { Roles } from '../../auth/interface/decorators/roles.decorator';
 import { ListTransactionsUseCase } from '../application/list-transactions.use-case';
 import { TransactionQueryDto } from './dto/transaction-query.dto';
 
 @ApiTags('Transactions')
 @ApiBearerAuth()
+@Roles('CUSTOMER')
 @Controller({ path: 'accounts', version: '1' })
 export class TransactionsController {
   constructor(private readonly listTransactions: ListTransactionsUseCase) {}
