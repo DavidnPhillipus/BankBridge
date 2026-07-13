@@ -3,7 +3,9 @@
 import { useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { accountsApi, transactionsApi } from '@/lib/api';
+import { PageHeader } from '@/components/layout/page-header';
 import { formatDate, formatMoney } from '@/lib/format';
+import { cn } from '@/lib/utils';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Skeleton } from '@/components/ui/skeleton';
@@ -25,11 +27,8 @@ export default function TransactionsPage(): React.ReactElement {
   });
 
   return (
-    <div className="space-y-6">
-      <div>
-        <h1 className="text-2xl font-semibold">Transactions</h1>
-        <p className="text-muted-foreground">Recent activity across your accounts</p>
-      </div>
+    <>
+      <PageHeader title="Transactions" description="Recent activity across your accounts" />
 
       <div className="flex flex-wrap gap-2">
         {accounts?.map((a) => (
@@ -37,11 +36,10 @@ export default function TransactionsPage(): React.ReactElement {
             key={a.id}
             type="button"
             onClick={() => setAccountId(a.id)}
-            className={`rounded-lg border px-4 py-2 text-sm transition ${
-              selected === a.id
-                ? 'border-primary bg-primary/10 text-primary'
-                : 'border-border hover:bg-secondary/40'
-            }`}
+            className={cn(
+              'fc-chip',
+              selected === a.id ? 'fc-chip-active' : 'hover:bg-secondary/60',
+            )}
           >
             {a.bankName} · {a.name}
           </button>
@@ -58,7 +56,7 @@ export default function TransactionsPage(): React.ReactElement {
           {isLoading ? (
             <div className="space-y-3">
               {[1, 2, 3, 4, 5].map((i) => (
-                <Skeleton key={i} className="h-12" />
+                <Skeleton key={i} className="h-12 rounded-lg" />
               ))}
             </div>
           ) : (
@@ -74,7 +72,7 @@ export default function TransactionsPage(): React.ReactElement {
                     </p>
                   </div>
                   <div className="text-right">
-                    <p className={t.type === 'CREDIT' ? 'text-emerald-400' : 'text-foreground'}>
+                    <p className={t.type === 'CREDIT' ? 'font-semibold text-emerald-600' : 'font-semibold'}>
                       {t.type === 'CREDIT' ? '+' : '-'}
                       {formatMoney(t.amount, t.currency)}
                     </p>
@@ -86,6 +84,6 @@ export default function TransactionsPage(): React.ReactElement {
           )}
         </CardContent>
       </Card>
-    </div>
+    </>
   );
 }

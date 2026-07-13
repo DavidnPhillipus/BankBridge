@@ -1,11 +1,11 @@
 'use client';
 
-import Link from 'next/link';
 import { useQuery } from '@tanstack/react-query';
 import { BookOpen, KeyRound, Layers, ShieldCheck } from 'lucide-react';
 import { developerApi } from '@/lib/api';
+import { PageHeader, QuickLinkCard, StatCard } from '@/components/layout/page-header';
 import { buttonVariants } from '@/components/ui/button';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { cn } from '@/lib/utils';
 
 const CAPABILITIES = [
@@ -34,106 +34,72 @@ export default function DeveloperDashboardPage(): React.ReactElement {
   const activeKeys = keys?.filter((k) => !k.revokedAt).length ?? 0;
 
   return (
-    <div className="space-y-8">
-      <div>
-        <h1 className="text-2xl font-semibold">Developer dashboard</h1>
-        <p className="text-muted-foreground">
-          Build fintech apps on FinConnect — separate from the customer banking experience.
-        </p>
-      </div>
+    <>
+      <PageHeader
+        title="Developer dashboard"
+        description="Build fintech apps on FinConnect — separate from the customer banking experience."
+      />
 
       <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-        <Card>
-          <CardHeader className="pb-2">
-            <CardDescription>Applications</CardDescription>
-            <CardTitle className="text-3xl">{appCount}</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <Link href="/developer/applications" className={cn(buttonVariants({ variant: 'outline', size: 'sm' }))}>
-              Manage apps
-            </Link>
-          </CardContent>
-        </Card>
-        <Card>
-          <CardHeader className="pb-2">
-            <CardDescription>Active API keys</CardDescription>
-            <CardTitle className="text-3xl">{activeKeys}</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <Link href="/developer/api-keys" className={cn(buttonVariants({ variant: 'outline', size: 'sm' }))}>
-              Manage keys
-            </Link>
-          </CardContent>
-        </Card>
-        <Card>
-          <CardHeader className="pb-2">
-            <CardDescription>Environment</CardDescription>
-            <CardTitle className="text-lg">Sandbox</CardTitle>
-          </CardHeader>
-          <CardContent>
+        <StatCard title="Applications" value={String(appCount)} accent="purple" />
+        <StatCard title="Active API keys" value={String(activeKeys)} accent="gold" />
+        <div className="fc-card overflow-hidden">
+          <div className="h-1 bg-primary/60" />
+          <div className="p-6">
+            <p className="text-sm font-medium text-muted-foreground">Environment</p>
+            <p className="mt-2 font-display text-2xl font-bold">Sandbox</p>
             <a
               href="/docs"
               target="_blank"
               rel="noopener noreferrer"
-              className={cn(buttonVariants({ variant: 'outline', size: 'sm' }))}
+              className={cn(buttonVariants({ variant: 'outline', size: 'sm' }), 'mt-4')}
             >
               View API docs
             </a>
-          </CardContent>
-        </Card>
+          </div>
+        </div>
       </div>
 
-      <Card>
-        <CardHeader>
-          <CardTitle className="text-base">What you can do as a developer</CardTitle>
-          <CardDescription>Unlike customers, you do not link personal bank accounts here.</CardDescription>
+      <div className="fc-card-dark p-6 md:p-8">
+        <CardHeader className="p-0 pb-4">
+          <CardTitle className="text-white">What you can do as a developer</CardTitle>
+          <CardDescription className="text-white/60">
+            Unlike customers, you do not link personal bank accounts here.
+          </CardDescription>
         </CardHeader>
-        <CardContent>
-          <ul className="space-y-2">
+        <CardContent className="p-0">
+          <ul className="space-y-3">
             {CAPABILITIES.map((item) => (
-              <li key={item} className="flex items-start gap-2 text-sm text-muted-foreground">
-                <ShieldCheck className="mt-0.5 h-4 w-4 shrink-0 text-primary" />
+              <li key={item} className="flex items-start gap-3 text-sm text-white/80">
+                <ShieldCheck className="mt-0.5 h-4 w-4 shrink-0 text-[#5A39E1]" />
                 {item}
               </li>
             ))}
           </ul>
         </CardContent>
-      </Card>
+      </div>
 
       <div className="grid gap-4 md:grid-cols-3">
-        <Link
+        <QuickLinkCard
           href="/developer/applications"
-          className="flex items-center gap-3 rounded-xl border border-border p-4 transition hover:border-primary/40 hover:bg-secondary/30"
-        >
-          <Layers className="h-8 w-8 text-primary" />
-          <div>
-            <p className="font-medium">Applications</p>
-            <p className="text-sm text-muted-foreground">Register your fintech app</p>
-          </div>
-        </Link>
-        <Link
+          icon={Layers}
+          title="Applications"
+          description="Register your fintech app"
+        />
+        <QuickLinkCard
           href="/developer/api-keys"
-          className="flex items-center gap-3 rounded-xl border border-border p-4 transition hover:border-primary/40 hover:bg-secondary/30"
-        >
-          <KeyRound className="h-8 w-8 text-primary" />
-          <div>
-            <p className="font-medium">API keys</p>
-            <p className="text-sm text-muted-foreground">Authenticate API requests</p>
-          </div>
-        </Link>
-        <a
+          icon={KeyRound}
+          title="API keys"
+          description="Authenticate API requests"
+        />
+        <QuickLinkCard
           href="/docs"
-          target="_blank"
-          rel="noopener noreferrer"
-          className="flex items-center gap-3 rounded-xl border border-border p-4 transition hover:border-primary/40 hover:bg-secondary/30"
-        >
-          <BookOpen className="h-8 w-8 text-primary" />
-          <div>
-            <p className="font-medium">API reference</p>
-            <p className="text-sm text-muted-foreground">OpenAPI / Swagger</p>
-          </div>
-        </a>
+          icon={BookOpen}
+          title="API reference"
+          description="OpenAPI / Swagger"
+          external
+        />
       </div>
-    </div>
+    </>
   );
 }

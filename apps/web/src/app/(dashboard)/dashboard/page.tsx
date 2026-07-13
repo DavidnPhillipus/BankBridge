@@ -14,8 +14,13 @@ import {
 } from 'recharts';
 import { analyticsApi } from '@/lib/api';
 import { formatMoney, formatPercent } from '@/lib/format';
+import { PageHeader, StatCard } from '@/components/layout/page-header';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Skeleton } from '@/components/ui/skeleton';
+
+const CHART_PURPLE = '#5A39E1';
+const CHART_GOLD = '#E8940A';
+const CHART_RED = '#E05252';
 
 export default function DashboardPage(): React.ReactElement {
   const { data, isLoading } = useQuery({
@@ -26,29 +31,29 @@ export default function DashboardPage(): React.ReactElement {
   if (isLoading || !data) {
     return (
       <div className="space-y-6">
-        <Skeleton className="h-8 w-48" />
+        <Skeleton className="h-10 w-64" />
         <div className="grid gap-4 md:grid-cols-4">
           {[1, 2, 3, 4].map((i) => (
-            <Skeleton key={i} className="h-28" />
+            <Skeleton key={i} className="h-28 rounded-xl" />
           ))}
         </div>
-        <Skeleton className="h-80" />
+        <Skeleton className="h-80 rounded-xl" />
       </div>
     );
   }
 
   return (
-    <div className="space-y-8">
-      <div>
-        <h1 className="text-2xl font-semibold tracking-tight">Overview</h1>
-        <p className="text-muted-foreground">Your financial snapshot across linked banks</p>
-      </div>
+    <>
+      <PageHeader
+        title="Overview"
+        description="Your financial snapshot across linked banks"
+      />
 
       <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
-        <StatCard title="Income" value={formatMoney(data.totalIncome)} />
-        <StatCard title="Expenses" value={formatMoney(data.totalExpense)} />
-        <StatCard title="Net" value={formatMoney(data.net)} highlight={data.net >= 0} />
-        <StatCard title="Savings rate" value={formatPercent(data.savingsRate)} />
+        <StatCard title="Income" value={formatMoney(data.totalIncome)} accent="purple" />
+        <StatCard title="Expenses" value={formatMoney(data.totalExpense)} accent="default" />
+        <StatCard title="Net" value={formatMoney(data.net)} highlight={data.net >= 0} accent="gold" />
+        <StatCard title="Savings rate" value={formatPercent(data.savingsRate)} accent="purple" />
       </div>
 
       <div className="grid gap-6 lg:grid-cols-2">
@@ -70,8 +75,8 @@ export default function DashboardPage(): React.ReactElement {
                     borderRadius: 8,
                   }}
                 />
-                <Line type="monotone" dataKey="totalIncome" stroke="#818cf8" name="Income" />
-                <Line type="monotone" dataKey="totalExpense" stroke="#f87171" name="Expenses" />
+                <Line type="monotone" dataKey="totalIncome" stroke={CHART_PURPLE} strokeWidth={2} name="Income" />
+                <Line type="monotone" dataKey="totalExpense" stroke={CHART_RED} strokeWidth={2} name="Expenses" />
               </LineChart>
             </ResponsiveContainer>
           </CardContent>
@@ -101,31 +106,12 @@ export default function DashboardPage(): React.ReactElement {
                     borderRadius: 8,
                   }}
                 />
-                <Bar dataKey="amount" fill="hsl(var(--primary))" radius={4} />
+                <Bar dataKey="amount" fill={CHART_GOLD} radius={4} />
               </BarChart>
             </ResponsiveContainer>
           </CardContent>
         </Card>
       </div>
-    </div>
-  );
-}
-
-function StatCard({
-  title,
-  value,
-  highlight,
-}: {
-  title: string;
-  value: string;
-  highlight?: boolean;
-}): React.ReactElement {
-  return (
-    <Card>
-      <CardHeader className="pb-2">
-        <CardDescription>{title}</CardDescription>
-        <CardTitle className={highlight === false ? 'text-destructive' : undefined}>{value}</CardTitle>
-      </CardHeader>
-    </Card>
+    </>
   );
 }

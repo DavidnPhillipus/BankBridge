@@ -2,8 +2,9 @@
 
 import Link from 'next/link';
 import { ScrollText, Shield, Users } from 'lucide-react';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { PageHeader, QuickLinkCard } from '@/components/layout/page-header';
 import { buttonVariants } from '@/components/ui/button';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { cn } from '@/lib/utils';
 
 const RESPONSIBILITIES = [
@@ -15,18 +16,19 @@ const RESPONSIBILITIES = [
 
 export default function AdminDashboardPage(): React.ReactElement {
   return (
-    <div className="space-y-8">
-      <div>
-        <h1 className="text-2xl font-semibold">Admin dashboard</h1>
-        <p className="text-muted-foreground">
-          Platform operations — not a personal banking or developer workspace.
-        </p>
-      </div>
+    <>
+      <PageHeader
+        title="Admin dashboard"
+        description="Platform operations — not a personal banking or developer workspace."
+      />
 
       <div className="grid gap-4 sm:grid-cols-2">
-        <Card>
+        <Card className="overflow-hidden">
+          <div className="h-1 bg-primary" />
           <CardHeader className="flex flex-row items-center gap-3 space-y-0">
-            <Shield className="h-8 w-8 text-primary" />
+            <div className="fc-icon-box">
+              <Shield className="h-5 w-5" />
+            </div>
             <div>
               <CardTitle className="text-base">Platform security</CardTitle>
               <CardDescription>Audit trail and access monitoring</CardDescription>
@@ -38,9 +40,12 @@ export default function AdminDashboardPage(): React.ReactElement {
             </Link>
           </CardContent>
         </Card>
-        <Card>
+        <Card className="overflow-hidden opacity-90">
+          <div className="h-1 bg-[hsl(var(--fc-gold))]" />
           <CardHeader className="flex flex-row items-center gap-3 space-y-0">
-            <Users className="h-8 w-8 text-primary" />
+            <div className="fc-icon-box bg-[hsl(var(--fc-gold))]/15 text-[hsl(var(--fc-gold))]">
+              <Users className="h-5 w-5" />
+            </div>
             <div>
               <CardTitle className="text-base">User management</CardTitle>
               <CardDescription>Roles and accounts (coming soon)</CardDescription>
@@ -54,9 +59,9 @@ export default function AdminDashboardPage(): React.ReactElement {
           <CardTitle className="text-base">Administrator responsibilities</CardTitle>
         </CardHeader>
         <CardContent>
-          <ul className="space-y-2 text-sm text-muted-foreground">
+          <ul className="space-y-3 text-sm text-muted-foreground">
             {RESPONSIBILITIES.map((item) => (
-              <li key={item} className="flex items-start gap-2">
+              <li key={item} className="flex items-start gap-3">
                 <ScrollText className="mt-0.5 h-4 w-4 shrink-0 text-primary" />
                 {item}
               </li>
@@ -64,6 +69,13 @@ export default function AdminDashboardPage(): React.ReactElement {
           </ul>
         </CardContent>
       </Card>
-    </div>
+
+      <QuickLinkCard
+        href="/admin/audit-logs"
+        icon={ScrollText}
+        title="Audit logs"
+        description="Review platform-wide activity"
+      />
+    </>
   );
 }

@@ -3,7 +3,9 @@
 import { useState } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { banksApi, catalogApi, consentsApi } from '@/lib/api';
+import { PageHeader } from '@/components/layout/page-header';
 import { formatDate } from '@/lib/format';
+import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -48,11 +50,8 @@ export default function ConsentsPage(): React.ReactElement {
   }
 
   return (
-    <div className="space-y-6">
-      <div>
-        <h1 className="text-2xl font-semibold">Consents</h1>
-        <p className="text-muted-foreground">Manage which apps can access your bank data</p>
-      </div>
+    <>
+      <PageHeader title="Consents" description="Manage which apps can access your bank data" />
 
       <Card>
         <CardHeader>
@@ -62,11 +61,7 @@ export default function ConsentsPage(): React.ReactElement {
           <div className="grid gap-4 md:grid-cols-2">
             <div className="space-y-2">
               <Label>Application</Label>
-              <select
-                className="flex h-10 w-full rounded-lg border border-input bg-background px-3 text-sm"
-                value={appId}
-                onChange={(e) => setAppId(e.target.value)}
-              >
+              <select className="fc-select" value={appId} onChange={(e) => setAppId(e.target.value)}>
                 <option value="">Select app…</option>
                 {apps?.map((a) => (
                   <option key={a.id} value={a.id}>
@@ -77,11 +72,7 @@ export default function ConsentsPage(): React.ReactElement {
             </div>
             <div className="space-y-2">
               <Label>Bank</Label>
-              <select
-                className="flex h-10 w-full rounded-lg border border-input bg-background px-3 text-sm"
-                value={bankId}
-                onChange={(e) => setBankId(e.target.value)}
-              >
+              <select className="fc-select" value={bankId} onChange={(e) => setBankId(e.target.value)}>
                 <option value="">Select bank…</option>
                 {banks?.map((b) => (
                   <option key={b.id} value={b.id}>
@@ -97,9 +88,12 @@ export default function ConsentsPage(): React.ReactElement {
                 key={s}
                 type="button"
                 onClick={() => toggleScope(s)}
-                className={`rounded-full border px-3 py-1 text-xs ${
-                  scopes.includes(s) ? 'border-primary bg-primary/15 text-primary' : 'border-border'
-                }`}
+                className={cn(
+                  'rounded-full border px-3 py-1.5 text-xs font-medium transition',
+                  scopes.includes(s)
+                    ? 'border-primary bg-primary/10 text-primary'
+                    : 'border-border hover:border-primary/40',
+                )}
               >
                 {s}
               </button>
@@ -119,7 +113,7 @@ export default function ConsentsPage(): React.ReactElement {
           <Card key={c.id}>
             <CardContent className="flex flex-wrap items-center justify-between gap-4 p-6">
               <div>
-                <p className="font-medium">
+                <p className="font-semibold">
                   {c.applicationName} → {c.bankName}
                 </p>
                 <p className="text-sm text-muted-foreground">
@@ -143,6 +137,6 @@ export default function ConsentsPage(): React.ReactElement {
           </Card>
         ))}
       </div>
-    </div>
+    </>
   );
 }

@@ -1,7 +1,9 @@
 'use client';
 
 import { useQuery } from '@tanstack/react-query';
+import { Lightbulb } from 'lucide-react';
 import { insightsApi } from '@/lib/api';
+import { PageHeader } from '@/components/layout/page-header';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Skeleton } from '@/components/ui/skeleton';
@@ -22,25 +24,31 @@ export default function InsightsPage(): React.ReactElement {
   if (isLoading || !data) {
     return (
       <div className="space-y-4">
-        <Skeleton className="h-8 w-48" />
-        <Skeleton className="h-24" />
+        <Skeleton className="h-10 w-64 rounded-lg" />
+        <Skeleton className="h-24 rounded-xl" />
         {[1, 2, 3].map((i) => (
-          <Skeleton key={i} className="h-32" />
+          <Skeleton key={i} className="h-32 rounded-xl" />
         ))}
       </div>
     );
   }
 
   return (
-    <div className="space-y-6">
-      <div>
-        <h1 className="text-2xl font-semibold">AI Insights</h1>
-        <p className="text-muted-foreground">Personalized financial advice powered by your data</p>
-      </div>
+    <>
+      <PageHeader
+        title="AI Insights"
+        description="Personalized financial advice powered by your data"
+      />
 
-      <Card className="border-primary/30 bg-primary/5">
+      <Card className="overflow-hidden border-primary/30">
+        <div className="h-1 bg-gradient-to-r from-primary to-[hsl(var(--fc-gold))]" />
         <CardHeader>
-          <CardDescription>Summary · {data.provider}</CardDescription>
+          <div className="flex items-center gap-2">
+            <div className="fc-icon-box">
+              <Lightbulb className="h-5 w-5" />
+            </div>
+            <CardDescription>Summary · {data.provider}</CardDescription>
+          </div>
           <CardTitle className="text-lg font-normal leading-relaxed">{data.summary}</CardTitle>
         </CardHeader>
       </Card>
@@ -59,12 +67,14 @@ export default function InsightsPage(): React.ReactElement {
             </CardHeader>
             {insight.recommendation ? (
               <CardContent>
-                <p className="text-sm text-primary">{insight.recommendation}</p>
+                <p className="rounded-lg bg-primary/5 px-4 py-3 text-sm font-medium text-primary">
+                  {insight.recommendation}
+                </p>
               </CardContent>
             ) : null}
           </Card>
         ))}
       </div>
-    </div>
+    </>
   );
 }

@@ -2,6 +2,7 @@
 
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { notificationsApi } from '@/lib/api';
+import { PageHeader } from '@/components/layout/page-header';
 import { formatDate } from '@/lib/format';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
@@ -32,34 +33,33 @@ export default function NotificationsPage(): React.ReactElement {
   });
 
   return (
-    <div className="space-y-6">
-      <div className="flex flex-wrap items-center justify-between gap-4">
-        <div>
-          <h1 className="text-2xl font-semibold">Notifications</h1>
-          <p className="text-muted-foreground">Alerts and updates about your accounts</p>
-        </div>
+    <>
+      <PageHeader title="Notifications" description="Alerts and updates about your accounts">
         <Button variant="outline" onClick={() => markAll.mutate()} disabled={markAll.isPending}>
           Mark all read
         </Button>
-      </div>
+      </PageHeader>
 
       {isLoading ? (
         <div className="space-y-3">
           {[1, 2, 3].map((i) => (
-            <Skeleton key={i} className="h-20" />
+            <Skeleton key={i} className="h-20 rounded-xl" />
           ))}
         </div>
       ) : (
         <div className="space-y-3">
           {data?.data.map((n) => (
-            <Card key={n.id} className={n.isRead ? 'opacity-70' : 'border-primary/30'}>
+            <Card
+              key={n.id}
+              className={n.isRead ? 'opacity-70' : 'border-primary/30 ring-1 ring-primary/10'}
+            >
               <CardContent className="flex items-start justify-between gap-4 p-5">
                 <div>
                   <div className="mb-1 flex items-center gap-2">
                     <Badge variant="secondary">{n.type}</Badge>
-                    {!n.isRead ? <Badge variant="default">New</Badge> : null}
+                    {!n.isRead ? <Badge>New</Badge> : null}
                   </div>
-                  <p className="font-medium">{n.title}</p>
+                  <p className="font-semibold">{n.title}</p>
                   <p className="text-sm text-muted-foreground">{n.message}</p>
                   <p className="mt-1 text-xs text-muted-foreground">{formatDate(n.createdAt)}</p>
                 </div>
@@ -73,6 +73,6 @@ export default function NotificationsPage(): React.ReactElement {
           ))}
         </div>
       )}
-    </div>
+    </>
   );
 }

@@ -3,10 +3,12 @@
 import { useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { adminApi } from '@/lib/api';
+import { PageHeader } from '@/components/layout/page-header';
 import { formatDate } from '@/lib/format';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
+import { Skeleton } from '@/components/ui/skeleton';
 
 export default function AdminAuditLogsPage(): React.ReactElement {
   const [page, setPage] = useState(1);
@@ -17,13 +19,19 @@ export default function AdminAuditLogsPage(): React.ReactElement {
   });
 
   return (
-    <div className="space-y-6">
-      <div>
-        <h1 className="text-2xl font-semibold">Audit logs</h1>
-        <p className="text-muted-foreground">Platform-wide activity across all users and resources.</p>
-      </div>
+    <>
+      <PageHeader
+        title="Audit logs"
+        description="Platform-wide activity across all users and resources."
+      />
 
-      {isLoading ? <p className="text-sm text-muted-foreground">Loading…</p> : null}
+      {isLoading ? (
+        <div className="space-y-2">
+          {[1, 2, 3, 4].map((i) => (
+            <Skeleton key={i} className="h-20 rounded-xl" />
+          ))}
+        </div>
+      ) : null}
 
       <div className="space-y-2">
         {data?.data.map((log) => (
@@ -70,6 +78,6 @@ export default function AdminAuditLogsPage(): React.ReactElement {
           </Button>
         </div>
       ) : null}
-    </div>
+    </>
   );
 }
